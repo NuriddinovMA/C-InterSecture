@@ -1,6 +1,7 @@
 import sys
 import timeit
-import preArChER_func as prAf
+import numpy as np
+import preArChER_func_pandas as prAf
 
 Args = {
 	'genome':'','chrom_order':'','sample_name':'','out_folder':'',
@@ -63,21 +64,21 @@ print '\t%i normalized matrix reading tume: %.2f sec; memory sized: %.2f Mb' % (
 #All contact hashed by distance
 #
 print '\nStep 3: Distance depended statistics... '
-npContactBins = prAf.iContactBinStat(rawContactHash,normContactHash)
+pdContactBins = prAf.iContactBinStat(rawContactHash,normContactHash)
 del rawContactHash
 del normContactHash
 elp = timeit.default_timer() - start_time
 print '\t...genome bin statistic calculating end time  %.2f sec; sec memory sized: %.2f Mb' % ( elp, sys.getsizeof(npContactBins)/1024.0/1024.0 )
-contactDistanceHash = prAf.iDistanceHash(npContactBins,Args['max_distance']*1e6/Args['resolution'])
-del npContactBins
+contactDistanceHash = prAf.iDistanceHash(pdContactBins,Args['max_distance']*1e6/Args['resolution'])
 elp = timeit.default_timer() - start_time
-print '...Analyzing end time %.2f sec; memory sized: %.2f Mb' % ( elp, sys.getsizeof(contactDistanceHash)/1024.0/1024.0 ) 
+print '...Analyzing end time %.2f  sec; memory sized: %.2f Mb' % ( elp, sys.getsizeof(contactDistanceHash)/1024.0/1024.0 ) 
 #
 #Percentilyzing contact hashed by distance
 #
 print '\nStep 4: Contact transforming by %s statistic...' % Args['statistic']
-totalContactList = prAf.iTotalContactListing(contactDistanceHash, Args['statistic'],Args['resolution'],out_name)
+totalContactList = prAf.iTotalContactListing(pdContactBins, contactDistanceHash, Args['statistic'],Args['resolution'],out_name)
 del contactDistanceHash
+del pdContactBins
 elp = timeit.default_timer() - start_time
 print '... contact transforming end time %.2f sec; memory sized: %.2f Mb' % ( elp, sys.getsizeof(totalContactList)/1024.0/1024.0 )
 #

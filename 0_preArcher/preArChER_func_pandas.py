@@ -4,6 +4,8 @@ try: import numpy as np
 except ImportError: print "numpy not found!"
 try: import scipy.stats as sc
 except ImportError: print "scipy.stats not found!"
+try: import pandas
+except ImportError: print "pandas not found!"
 
 def HashTry(Hash, key):
 	t = 1
@@ -177,45 +179,45 @@ def iContactBinStat(rawContactHash, normContactHash):
 	for key in rawContactHash[0]:
 		try:
 			contactBinList.append(
-				(key[0], key[1], key[2], key[3], rawContactHash[0][key],
-				normContactHash[key][0], rawContactHash[1][key[:2]], rawContactHash[1][key[2:]], normContactHash[key][1])
+				(key[0], key[1], key[2], key[3],
+				normContactHash[key][0], rawContactHash[0][key], None, None, rawContactHash[1][key[:2]], rawContactHash[1][key[2:]], normContactHash[key][1])
 			)
 		except KeyError: pass
-	return np.array(contactBinList, dtype=np.float32)
+	contactBin = pd.DataFrame.from_records(contactBinList, columns=['chr1','pos1','chr2','pos2','contacts','disp','min','max','cov1','cov2','dist'])
+	del contactBinList
+	contactBin['disp'] = np.sqrt(1./contactBin['disp'])
+	return contactBin
 
-def iDistanceHash(npContactBins,dist_max):
-	contactDistanceHash = {}
-	print '\tDeviation calculate for contactList between %i locus pair' % (len(npContactBins))
+def iDistanceHash(pdContactBins,dist_max):
+	print '\tDeviation calculate for contactList between %i locus pair' % (len(pdContactBins))
+	DistanceHash = {}
 	start_time = timeit.default_timer()
-	temp = np.transpose( np.vstack( (
-		npContactBins[:,0],npContactBins[:,1],npContactBins[:,2],npContactBins[:,3],npContactBins[:,4],
-		npContactBins[:,5],
-		np.sqrt( 1.0/npContactBins[:,4] ),
-		npContactBins[:,6], npContactBins[:,7],
-		npContactBins[:,8]
-		) ) )
-	Keys = np.unique(temp[:,-1])
-	contactDistanceHash = dict([(i,[]) for i in Keys])
-	for i in temp: contactDistanceHash[i[-1]].append(i)
-	del temp
-	Keys = sorted(contactDistanceHash.keys())
+	Keys = sorted(pd.unique(pdContactBins['dist']))
 	Keys = Keys[1:] + [Keys[0],]
-	#print '\t\t', Keys
 	base_key = Keys[0]
-	base_count = len(contactDistanceHash[base_key])
+	base_count = pdContactBins[contactBins['dist'] == base_key ]['dist'].count()
 	for key in Keys[1:]:
-		if key >= dist_max or len(contactDistanceHash[key]) < 0.2*base_count:
-			if len(contactDistanceHash[key]) > base_count/2: base_key = key
-			elif len(contactDistanceHash[base_key]) > 0.75*base_count: base_key = key
+		current_count = pdContactBins[contactBins['dist'] == key]['dist'].count()
+		if key >= dist_max or current_count < 0.2*base_count:
+			if current_count > base_count/2:
+				base_key = key
+				DistanceHash[key] = base_key
+				sum_count = current_count
+			elif sum_count > 0.75*base_count:
+				base_key = key
+				DistanceHash[key] = base_key
+				sum_count = current_count
 			else:
-				contactDistanceHash[base_key] += contactDistanceHash[key]
-				del contactDistanceHash[key]
-		else: pass
+				DistanceHash[key] = base_key
+				sum_count += current_count
+		else: base_key = key
+		DistanceHash[key] = base_key
 	del Keys
-	print '\t', sorted(contactDistanceHash.keys())
+	print '\t', sorted(contactDistance.keys())
+	pdContactBins['dist'] = pdContactBins['dist'].applymap(DistanceHash.get)
 	elp = timeit.default_timer() - start_time
 	print '\tDistance Hashing full time:', elp
-	return contactDistanceHash
+	return DistanceHash
 
 def iPercentileStatistics(contactDistanceHash):
 	start_time = timeit.default_timer()
@@ -271,22 +273,22 @@ def iPRC(c,prcList):
 		else: prc[2] = prc[0]
 	return prc
 
-def iPercentilizer(contactDistanceHash_key, prcList):
+def iPercentilizer(pdContactBins, DistanceHash, prcList):
 	prcContactList = []
-	for i in range(len(contactDistanceHash_key)):
-		prc = iPRC(contactDistanceHash_key[i][5:],prcList)
-		prcContactList.append( (contactDistanceHash_key[i][0],contactDistanceHash_key[i][1],contactDistanceHash_key[i][2],contactDistanceHash_key[i][3], prc[0],prc[1],prc[2],contactDistanceHash_key[i][7],contactDistanceHash_key[i][8], contactDistanceHash_key[i][9]) )
+	for key in DistanceHash['key']: 
+		prc = iPRC(pdContactBins[pdContactBins['dist'] == key]['contacts'],prcList)
+		pdContactBins['contacts'] = pdContactBins[pdContactBins['dist'] == key]['contacts'].apply(iPRC, args=(prcList))
+		pdContactBins['min'] = (pdContactBins[pdContactBins['dist'] == key]['contacts'] * (1. - pdContactBins['disp'])).apply(iPRC, args=(prcList))
+		pdContactBins['max'] = (pdContactBins[pdContactBins['dist'] == key]['contacts'] * (1. + pdContactBins['disp'])).apply(iPRC, args=(prcList))
 	return prcContactList
 
-def iAbsoluteContacts(contactDistanceHash_key):
+def iAbsoluteContacts(pdContactBins):
 	absContactList = []
-	for i in range(len(contactDistanceHash_key)):
-		disp = contactDistanceHash_key[i][6]
-		c = contactDistanceHash_key[i][5]
-		absContactList.append( (contactDistanceHash_key[i][0],contactDistanceHash_key[i][1], contactDistanceHash_key[i][2], contactDistanceHash_key[i][3], int(c), int(c*(1-disp)), int(c*(1+disp)), contactDistanceHash_key[i][7], contactDistanceHash_key[i][8], contactDistanceHash_key[i][9]) )
+	pdContactBins['min'] = pdContactBins['contacts'] * (1. - pdContactBins['disp'])
+	pdContactBins['max'] = pdContactBins['contacts'] * (1. + pdContactBins['disp'])
 	return absContactList
 
-def iTotalContactListing(contactDistanceHash,statistics,resolution,path):
+def iTotalContactListing(pdContactBins, contactDistanceHash,statistics,resolution,path):
 	totalContactList = []
 	start_time = timeit.default_timer()
 	f = open(path + '.pandas.stat','w')
@@ -323,7 +325,7 @@ def iBinContactWriter(path, contactList, ChrInd):
 	print '\tDatabase sorting:',elp
 	start_time = timeit.default_timer()
 	f = open(path +'.pandas.initialContacts','w')
-	print >> f, 'chr1\tpos1\tchr2\tpos2\tcontact\tmin\tmax\tcov1\tcov2\tdist'
+	print >> f, 'chr1\tpos1\tchr2\tpos2\tcontacts\tmin\tmax\tcov1\tcov2\tdist'
 	for i in range(len(contactList)):
 		try:
 			print >> f, '%s\t%i\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i' % (ChrInd[contactList[i][0]],contactList[i][1],ChrInd[contactList[i][2]],contactList[i][3],contactList[i][4],contactList[i][5],contactList[i][6],contactList[i][7],contactList[i][8],contactList[i][9])

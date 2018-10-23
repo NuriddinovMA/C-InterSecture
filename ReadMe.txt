@@ -2,4 +2,5 @@ ArChER (Architectural Chromatin Evolution Reseach) is python 2.7 utilits to cros
 
 Required:
 - numpy
+- scipy
 - genome module from mirnylib package (cut-offed version is included)
