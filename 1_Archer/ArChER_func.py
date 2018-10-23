@@ -232,7 +232,7 @@ def iReadingMarkPoints(path, resolution, ChrIdxs1,ChrIdxs2):  #Creating Mark Poi
 	ObjCoorMP = {},{},{}
 	key = ''
 	frame = 120000/resolution
-	f = open(path, 'r')
+	f = open(path+'.mark', 'r')
 	lines = f.readlines()
 	f.close()
 	for i in range(len(lines)-1,0,-1):
