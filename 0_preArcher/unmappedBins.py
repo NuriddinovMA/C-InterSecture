@@ -7,7 +7,7 @@ start_time = timeit.default_timer()
 lines = sys.stdin.readlines()
 
 for line in lines:
-	if line.strip()[0] != '#':
+	if len(line) > 0 and line.strip()[0] != '#':
 		parse = line.split()
 		print '\tReading fasta...', parse[0]
 		GNM = Genome(parse[0])

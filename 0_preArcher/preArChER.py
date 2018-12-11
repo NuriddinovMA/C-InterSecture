@@ -30,7 +30,7 @@ out_name = Args['out_folder'] + suffix
 print 'Step 0: data preparing...'
 print '\tGenome analysis...'
 start_time = timeit.default_timer()
-l2i = prAf.iChromIndexing(Args['chrom_order'])
+l2i = prAf.ChromIndexing(Args['chrom_order'])
 ubh = prAf.unmappedBasesBin(Args['genome'], Args['resolution'], l2i, Args['unmapped_bases'])
 elp = timeit.default_timer() - start_time
 print '\t... end genome analysing %.2f sec' % elp
@@ -47,7 +47,7 @@ print '...end data preparing %.2f sec' % elp
 #
 print '\nStep 1: Raw matrix reading...'
 print '\tDropped bins', len(ubh)
-rawContactHash = prAf.iSparseMatrixReader(Args['raw_contacts'], binIdxs, ubh, raw=True)
+rawContactHash = prAf.iSparseMatrixReader(Args['raw_contacts'], binIdxs, ubh, coverage=Args['coverage'],raw=True)
 print '\tDropped bins', len(ubh)
 elp = timeit.default_timer() - start_time
 print '\t%i contact analyzing for %.2f sec; memory sized: %.2f Mb' % (len(rawContactHash[1]), elp, 1.0*sys.getsizeof(rawContactHash)/1024/1024)

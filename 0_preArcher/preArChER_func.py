@@ -26,7 +26,7 @@ def unmappedBasesBin(path, resolution, ChrInd, threshold):
 	del lines
 	return ubh
 
-def iChromIndexing(path):
+def ChromIndexing(path):
 	ChrInd = {}
 	f = open(path,'r')
 	lines = f.readlines()
@@ -47,6 +47,7 @@ def iBin2Label(path, ChrInd, resolution):
 		parse = f.readline().split()
 		try: binIdxs.append( (ChrInd[parse[0]],int(parse[1])/resolution) ) 
 		except IndexError: break
+		except KeyError: binIdxs.append(False)
 	f.close()
 	return binIdxs
 
@@ -54,13 +55,13 @@ def iSparseMatrixReader(path, binIdxs, unBinHash, **kwargs):
 	try: raw = kwargs['raw']
 	except KeyError: raw = True
 	try: coverage = kwargs['coverage']
-	except KeyError: coverage = 0
+	except KeyError: coverage = 1
 	if raw == True: 
 		contactHash = _iRawSparceMatrixReader(path,binIdxs,unBinHash,int)
-		contactHash = _iContactFiltring(contactHash, unBinHash,coverage)
+		contactHash = _iContactFiltring(contactHash,unBinHash,coverage)
 	else: 
 		contactHash = _iNormedSparceMatrixReader(path,binIdxs,float)
-		contactHash = _iMatrixNorming(contactHash, unBinHash)
+		contactHash = _iMatrixNorming(contactHash,unBinHash)
 	return contactHash
 
 def _iRawSparceMatrixReader(path,binIdxs,unBinHash,format):
@@ -75,26 +76,29 @@ def _iRawSparceMatrixReader(path,binIdxs,unBinHash,format):
 	for i in range(ln-1,-1,-1):
 		parse = lines[i].split()
 		del lines[i]
-		s0 = binIdxs[int(parse[0])]
-		s1 = binIdxs[int(parse[1])]
-		c = format(parse[2])
-		if ( ( (s0[0] == s1[0]) and (abs(s1[1] - s0[1]) > 1) ) or (s0[0] != s1[0]) ):
-			if ( HashTry(unBinHash, s0) == 0 ) and ( HashTry(unBinHash, s1) == 0 ): 
-				if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
-					if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
-					else: contactHash[0][s0+s1] += c
-				else:
-					if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
-					else: contactHash[0][s1+s0] += c
-				if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
-				else: contactHash[1][s0] += c
-				if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
-				else: contactHash[1][s1] += c
+		try:
+			s0 = binIdxs[int(parse[0])]
+			s1 = binIdxs[int(parse[1])]
+			c = format(parse[2])
+			if ( ( (s0[0] == s1[0]) and (abs(s1[1] - s0[1]) > 1) ) or (s0[0] != s1[0]) ):
+				if ( HashTry(unBinHash, s0) == 0 ) and ( HashTry(unBinHash, s1) == 0 ): 
+					if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
+						if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
+						else: contactHash[0][s0+s1] += c
+					else:
+						if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
+						else: contactHash[0][s1+s0] += c
+					if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
+					else: contactHash[1][s0] += c
+					if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
+					else: contactHash[1][s1] += c
+				else: pass
 			else: pass
-		else: pass
-		if (ln-i) % 10000000 == 0:
-			elp = timeit.default_timer() - start_time
-			print '\t\traw sparse matrix parsing progress: %i, time elapsed: %.2f, memory sized: %.2fMb' % (ln-i, elp, 1.0*sys.getsizeof(contactHash)/1024/1024 )
+			if (ln-i) % 10000000 == 0:
+				elp = timeit.default_timer() - start_time
+				print '\t\traw sparse matrix parsing progress: %i, time elapsed: %.2f, memory sized: %.2fMb' % (ln-i, elp, 1.0*sys.getsizeof(contactHash)/1024/1024 )
+		except KeyError: pass
+		except TypeError: pass
 	return contactHash
 
 def _iNormedSparceMatrixReader(path,binIdxs,format):
@@ -109,22 +113,25 @@ def _iNormedSparceMatrixReader(path,binIdxs,format):
 	for i in range(ln-1,-1,-1):
 		parse = lines[i].split()
 		del lines[i]
-		s0 = binIdxs[int(parse[0])]
-		s1 = binIdxs[int(parse[1])]
-		c = format(parse[2])
-		if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
-			if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
-			else: contactHash[0][s0+s1] += c
-		else:
-			if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
-			else: contactHash[0][s1+s0] += c
-		if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
-		else: contactHash[1][s0] += c
-		if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
-		else: contactHash[1][s1] += c
-		if (ln-i) % 10000000 == 0:
-			elp = timeit.default_timer() - start_time
-			print '\t\tnormed sparse matrix parsing progress: %i, time elapsed: %.2f, memory sized: %.2fMb' % (ln-i, elp, 1.0*sys.getsizeof(contactHash)/1024/1024 )
+		try:
+			s0 = binIdxs[int(parse[0])]
+			s1 = binIdxs[int(parse[1])]
+			c = format(parse[2])
+			if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
+				if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
+				else: contactHash[0][s0+s1] += c
+			else:
+				if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
+				else: contactHash[0][s1+s0] += c
+			if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
+			else: contactHash[1][s0] += c
+			if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
+			else: contactHash[1][s1] += c
+			if (ln-i) % 10000000 == 0:
+				elp = timeit.default_timer() - start_time
+				print '\t\tnormed sparse matrix parsing progress: %i, time elapsed: %.2f, memory sized: %.2fMb' % (ln-i, elp, 1.0*sys.getsizeof(contactHash)/1024/1024 )
+		except KeyError: pass
+		except TypeError: pass
 	return contactHash
 
 def _iContactFiltring(contactHash, unBinHash, coverage):
@@ -289,7 +296,7 @@ def iAbsoluteContacts(contactDistanceHash_key):
 def iTotalContactListing(contactDistanceHash,statistics,resolution,path):
 	totalContactList = []
 	start_time = timeit.default_timer()
-	f = open(path + '.pandas.stat','w')
+	f = open(path + '.stat','w')
 	Keys = sorted(contactDistanceHash.keys())
 	if statistics == 'prc':
 		for key in Keys:
@@ -322,7 +329,7 @@ def iBinContactWriter(path, contactList, ChrInd):
 	elp = timeit.default_timer() - start_time
 	print '\tDatabase sorting:',elp
 	start_time = timeit.default_timer()
-	f = open(path +'.pandas.initialContacts','w')
+	f = open(path +'.initialContacts','w')
 	print >> f, 'chr1\tpos1\tchr2\tpos2\tcontact\tmin\tmax\tcov1\tcov2\tdist'
 	for i in range(len(contactList)):
 		try:

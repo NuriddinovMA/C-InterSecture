@@ -5,7 +5,7 @@ import ArChER_func as Af
 Args = {
 	'contact_path':'','contact_files':'','genome_path':'','chrom_orders':'',
 	'remap_path':'','remap_files':'','out_path':'',
-	'resolution':10000, 'confidence':3,'max_difference':33,'model':'balanced'
+	'resolution':10000,'model':'balanced'
 }
 
 lines = sys.stdin.readlines()
@@ -27,7 +27,7 @@ start_time = timeit.default_timer()
 print '\nStep 0: chromosome indexing...'
 l2i = []
 fname = [Args['genome_path']+Args['chrom_orders'][i] for i in range(2)]
-for i in range(2): l2i.append( Af.iChromIndexing(fname[i]) )
+for i in range(2): l2i.append( Af.ChromIndexing(fname[i]) )
 elp = timeit.default_timer() - start_time
 print '... chromosome indexing total time:', elp
 
@@ -56,9 +56,9 @@ print '... mark point reading total time:', elp
 print '\nStep 3: start contact comparing...'
 fname = [Args['out_path']+Args['contact_files'][i] for i in range(2)]
 for i in range(2):
-	out_name = '%s.%im.%iC.%iD.allContacts' % (fname[i],Args['model'],Args['confidence'],Args['max_difference'])
+	out_name = '%s.%s.allContacts' % (fname[i],Args['model'])
 	print '\tstart contact comparing...', out_name
-	Dif_Contact = Af.iDifferContact(contactList[i], contactList[1-i], MarkPoints[i], Args['resolution'], Args['model'], Args['confidence'], Args['max_difference'],l2i[i-1])
+	Dif_Contact = Af.iDifferContact(contactList[i], contactList[1-i], MarkPoints[i], Args['resolution'], Args['model'],l2i[i-1])
 	elp = timeit.default_timer() - start_time
 	print '\tend contact comparing', elp
 	
