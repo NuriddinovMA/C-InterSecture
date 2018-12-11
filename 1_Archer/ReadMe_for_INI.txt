@@ -1,9 +1,0 @@
-contact_dir = #path folder with contact prepared by preArChER
-contact_files = #contacts of species_1 #contacts of species_2 
-Resolution = #bin size
-remap_dir = #path folder with mark-file
-remap_file = #file with remapping species_1 to species_2 #file with remapping species_2 to species_1
-model = #used model 0,1 or 2
-confidence = #confidence of differency, (percentile_sp1-percentile_sp2)/(summarized deviation) > confidence
-equal = #confidence of equavalency (summarized deviation) < equal
-file_out = #name of output filespecies_2 lifted over species_1 #name of output file species_1 lifted over species_2
