@@ -1,16 +1,16 @@
-## C-InterSecture
+# C-InterSecture
 **C-InterSecture** (*C*omputional tool for *InterS*pecies analysis of genome archit*ecture*) pipline is python 2.7 based utilits to cross-species comparison of Hi-C map. C-InterSecture was designed to liftover contacts between species, compare 3-dimensional organization of defined genomic regions, such as TADs, and analyze statistically of individual contact frequencies.
  
-# Prerequisites:
+## Prerequisites:
 - numpy >= 1.9.0
 - scipy >= 1.1.0
 - [genome module](https://mirnylab.bitbucket.io/hiclib/_modules/mirnylib/genome.html) from mirnylib package with dependencies (it's minimal required module is included)
 - Juicer Tools (to generate .hic-files)
 
-# Installation
+## Installation
 There is no need for installation.
 
-# Using C-InterSecture
+## Using C-InterSecture
 C-InterSecture pipeline involves three step: data preprocessing, contact liftovering and, finally, visualization. Scripts for each step are placed in special folder. 
 
 ### Data preprocessing
