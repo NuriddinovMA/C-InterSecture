@@ -5,6 +5,7 @@
 - numpy >= 1.9.0
 - scipy >= 1.1.0
 - [genome module](https://mirnylab.bitbucket.io/hiclib/_modules/mirnylib/genome.html) from mirnylib package with dependencies (it's minimal required module is included)
+- Juicer Tools (to generate .hic-files)
 
 # Installation
 There is no need for installation.
@@ -35,7 +36,7 @@ Output files are (and must been) placed with genome file and named as `geneme_fi
 ```
 chrName bin_start bin_end N-bases coverage
 ```
-After generation `.unmap`-files, can run preprocessing
+After generation `.unmap`-files, can run the preprocessing:
 ```
 python pre.py < pre.ini
 ```
@@ -71,3 +72,30 @@ The preprocessed contacts are stored using a simple tab-delimited text format:
 ```chr1	/ pos1	/ chr2/ 	pos2 /	contact	/ min /	max /	cov1 /	cov2	/ dist```
 The *min* and *max* columns reflect a range of contact dispersion. The *cov1* and *cov2* columns reflect a Hi-C read coverage of contacted bin. The *dist* columns store a genome distance between contacted bins. If dist = -1000, this contact is interchromosomal.
 
+### Contact liftovering
+This step requires a pair of `.initialContacts`-files from compared species and a pair of files containing synteny map. 
+The synteny files (`.mark`) contain the mapping rules between the compared species as a simple tab-delimited text format:
+```
+chr_species_1 \ start \ end \ chr_species_2 \ start \ end
+```
+The synteny map may be generated from `.net`-files [see UCSC pairwise alignments](http://hgdownload.soe.ucsc.edu/downloads.html) using 'net2mark.py' utilty or any others ways.
+```
+python net2mark.py < net.ini
+```
+The file `net.ini` includes a space/tab delimited list of `net.`-files:
+```
+path_to_folder_containing_net-files 
+net1 net2
+net3 net4 net5
+...
+```
+After generation `.mark`-files, can run the contact lifovering:
+```
+python lift.py < lift.ini
+```
+
+### Postprocessing
+This step produces user-friendly ouput.
+`python allContacts2hic.py < hic.ini` - generates .hic-files for JuiceBox for full genome comparing;
+`python allContacts2plot.py < plot.ini` - generates a heat-map to given region reflected difference between a chromatin architecture of comparing species and statistical significance; 
+`python allContacts2metric.py < metric.ini` - calcultate a quantitatively estimation of difference between a chromatin architecture of comparing species  and generate coresponded .bedGraph-files.
