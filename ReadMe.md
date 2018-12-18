@@ -40,11 +40,8 @@ After generation `.unmap`-files, can run the preprocessing:
 ```
 python pre.py < pre.ini
 ```
-Ini-file contains all neaded paramaters to performing (see example).
-
-The output files are named as: *out_folder*/*sample_name*.*statistic*.*resolution*kb.*unmapped_bases*N.*covarage*C.*max_distance*Mb.initialContacts
-
-The preprocessed contacts are stored using a simple tab-delimited text format:
+Ini-file contains all neaded paramaters to performing (see example). 
+The preprocessed contacts (`.initialContacts`-files) are stored using a simple tab-delimited text format:
 ```
 chr1 \ pos1 \ chr2 \ pos2 \ contacts \ min \ max \ coverages1 \ coverages2	\ distances
 ```
@@ -68,7 +65,7 @@ net3 net4 net5
 After generation `.mark`-files, can run the contact lifovering:
 ```python lift.py < lift.ini```
 Ini-file contains all neaded paramaters to performing (see example).
-The pipeline produce **two** `.allContacts`-files: species_1 to species_2 and species_2 to species_1.
+The pipeline produce **two** `.allContacts`-files with liftovered contacts: species_1 to species_2 and species_2 to species_1.
 The lifoveres contacts are stored using a simple tab-delimited text format:
 ```
 chr1_reference \ pos1_reference \ chr2_reference \ pos2_reference \ remap1_query \ remap2_query \ reference_contacts \ query_contacts \ reference_deviations \ query_deviations	\ reference_coverages \ query_coverages	\ query_contact_distances
