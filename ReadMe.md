@@ -5,7 +5,7 @@
 - numpy >= 1.9.0
 - scipy >= 1.1.0
 - [genome module](https://mirnylab.bitbucket.io/hiclib/_modules/mirnylib/genome.html) from mirnylib package with dependencies (it's minimal required module is included)
-- Juicer Tools (to generate .hic-files)
+- [Juicer Tools](https://github.com/aidenlab/juicer) (to generate .hic-files)
 
 ## Installation
 There is no need for installation.
