@@ -46,7 +46,7 @@ The output files are named as: *out_folder*/*sample_name*.*statistic*.*resolutio
 
 The preprocessed contacts are stored using a simple tab-delimited text format:
 ```
-chr1	\ pos1	\ chr2 \ 	pos2 \	contacts	\ min \	max \	cov1 \	cov2	\ distance
+chr1	\ pos1	\ chr2 \ 	pos2 \	contacts	\ min \	max \	coverages1 \	coverages2	\ distances
 ```
 The *min* and *max* columns reflect a range of contact deviation. The *cov1* and *cov2* columns reflect a Hi-C read coverage of contacted bin. The *dist* columns store a genome distance between contacted bins. If dist = -1000, this contact is interchromosomal.
 
@@ -71,7 +71,7 @@ Ini-file contains all neaded paramaters to performing (see example).
 The pipeline produce **two** `.allContacts`-files: species_1 to species_2 and species_2 to species_1.
 The lifoveres contacts are stored using a simple tab-delimited text format:
 ```
-chr1_reference \	pos1_reference \ chr2_reference \ pos2_reference \ remap1_query \	remap2_query \	reference_contacts \	query_contacts \	reference_deviations \	query_deviations	\ reference_coverages \	query_coverages	\	query_contact_distances
+chr1_reference \ pos1_reference \ chr2_reference \ pos2_reference \ remap1_query \ remap2_query \ reference_contacts \ query_contacts \ reference_deviations \ query_deviations	\ reference_coverages \ query_coverages	\ query_contact_distances
 ```
 
 ### Postprocessing
