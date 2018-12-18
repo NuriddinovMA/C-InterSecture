@@ -388,7 +388,7 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 def iPrintDifferContact(data, resolution, ChrIdxs, out):
 	f = open(out, 'w')
 	Keys = sorted(data.keys(),key=lambda x: (x[0],x[2],x[1],x[3]))
-	print >> f, 'chr1\tpos1\tchr2\tpos2\tremap1\tremap2\treference\tquery\tdisp_ref\tdisp_que\tcvr_ref\tcvr_que\tdist_que'
+	print >> f, 'chr1_reference\tpos1_reference\tchr2_reference\tpos2_reference\tremap1_query\tremap2_query\treference_contacts\tquery_contacts\treference_deviations\tquery_deviations\treference_coverages\tquery_coverages\tquery_contact_distances'
 	for key in Keys:
 		i = data[key]
 		#for i in data[key]:
