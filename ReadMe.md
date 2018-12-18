@@ -54,10 +54,8 @@ The synteny files (`.mark`) contain the mapping rules between the compared speci
 ```
 chr_species_1 \ start \ end \ chr_species_2 \ start \ end
 ```
-The synteny map may be generated from `.net`-files [see UCSC pairwise alignments](http://hgdownload.soe.ucsc.edu/downloads.html) using 'net2mark.py' utilty or any others ways.
-```
-python net2mark.py < net.ini
-```
+The synteny map may be generated from `.net`-files [see UCSC pairwise alignments](http://hgdownload.soe.ucsc.edu/downloads.html) using 'net2mark.py' utilty or any others ways:
+```python net2mark.py < net.ini```
 The file `net.ini` includes a space/tab delimited list of `net.`-files (see example):
 ```
 path_to_folder_containing_net-files 
@@ -66,13 +64,13 @@ net3 net4 net5
 ...
 ```
 After generation `.mark`-files, can run the contact lifovering:
-```
-python lift.py < lift.ini
-```
+```python lift.py < lift.ini```
 Ini-file contains all neaded paramaters to performing (see example).
 The pipeline produce **two** `.allContacts`-files: species_1 to species_2 and species_2 to species_1.
 The lifoveres contacts are stored using a simple tab-delimited text format:
-```chr1_reference \	pos1_reference \ chr2_reference \ pos2_reference \ remap1_query \	remap2_query \	reference_contacts \	query_contacts \	reference_deviations \	query_deviations	\ reference_coverages \	query_coverages	\	query_contact_distances```
+```
+chr1_reference \	pos1_reference \ chr2_reference \ pos2_reference \ remap1_query \	remap2_query \	reference_contacts \	query_contacts \	reference_deviations \	query_deviations	\ reference_coverages \	query_coverages	\	query_contact_distances
+```
 
 ### Postprocessing
 This step produces user-friendly ouput.
