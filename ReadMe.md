@@ -16,9 +16,12 @@ C-InterSecture pipeline involves three step: data preprocessing, contact liftove
 The preprocessing scripts are located in "0_preprocessing" folder.
 The preprocessing includes a contacts filtration, statistical analysis and equalization. This step requires genome files, raw and normalized contact matrices.
 To filtrate contacts, the pipeline requires genome fasta-files. Using unmappedBins.py, it calculates a coverage by N-bases of each bin.
-`python unmappedBins.py < unmapped.ini`
+
+>`python unmappedBins.py < unmapped.ini`
+
 The file unmapped.ini includes a space/tab delimited list of genome fasta files and bin sizes:
-`# any comments
-path_to_sp1.fa resolution1 resolution2 resolution3
-path_to_sp2.fa resolution1 resolution2 resolution3
-...`
+
+>`# any comments`
+>`path_to_sp1.fa resolution1 resolution2 resolution3`
+>`path_to_sp2.fa resolution1 resolution2 resolution3`
+>`...`
