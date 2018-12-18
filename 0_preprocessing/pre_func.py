@@ -330,7 +330,7 @@ def iBinContactWriter(path, contactList, ChrInd):
 	print '\tDatabase sorting:',elp
 	start_time = timeit.default_timer()
 	f = open(path +'.initialContacts','w')
-	print >> f, 'chr1\tpos1\tchr2\tpos2\tcontact\tmin\tmax\tcov1\tcov2\tdist'
+	print >> f, 'chr1\tpos1\tchr2\tpos2\tcontacts\tmin\tmax\tcoverages1\tcoverages2\tdistance'
 	for i in range(len(contactList)):
 		try:
 			print >> f, '%s\t%i\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i' % (ChrInd[contactList[i][0]],contactList[i][1],ChrInd[contactList[i][2]],contactList[i][3],contactList[i][4],contactList[i][5],contactList[i][6],contactList[i][7],contactList[i][8],contactList[i][9])
