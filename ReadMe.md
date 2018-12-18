@@ -96,6 +96,9 @@ python lift.py < lift.ini
 
 ### Postprocessing
 This step produces user-friendly ouput.
-`python allContacts2hic.py < hic.ini` - generates .hic-files for JuiceBox for full genome comparing;
-`python allContacts2plot.py < plot.ini` - generates a heat-map to given region reflected difference between a chromatin architecture of comparing species and statistical significance; 
+
+`python allContacts2hic.py < hic.ini` - generates .hic-files for JuiceBox for full genome comparing, this option requires Juicer Tools;
+
+`python allContacts2plot.py < plot.ini` - generates a heat-map to given region reflected difference between a chromatin architecture of comparing species and statistical significance;
+
 `python allContacts2metric.py < metric.ini` - calcultate a quantitatively estimation of difference between a chromatin architecture of comparing species  and generate coresponded .bedGraph-files.
