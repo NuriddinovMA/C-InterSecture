@@ -1,8 +1,8 @@
 import os
 import sys
 import timeit
-import postArcher_func as psAf
-reload(psAf)
+import post_func as psf
+reload(psf)
 
 print 'Step 1: Sites Reading...'
 start_time = timeit.default_timer()
@@ -30,7 +30,7 @@ for line in lines:
 			if Args.has_key(key) == True: Args[key].update( dict([ s.split(':') for s in args ]))
 			else: Args[key] = dict([ s.split(':') for s in args ])
 		elif key == 'synblocks_files': Args[key].append( dict([ s.split(':') for s in args ]) )
-		elif key == 'use_synblocks' or key == 'statistics' or key == 'use_pre' or key == 'use_loci': Args[key] = psAf.boolean(args[0])
+		elif key == 'use_synblocks' or key == 'statistics' or key == 'use_pre' or key == 'use_loci': Args[key] = psf.boolean(args[0])
 		else:
 			try: Args[key] = args[0]
 			except KeyError: pass
@@ -105,10 +105,10 @@ for sm in range(len(Args['samples'])):
 					Args['use_pre'] = False
 			if Args['use_pre'] == False:
 				print '\tstart reading', s[0], s[1], s[2], elp
-				Order = psAf.ChromIndexing(G)
-				allCon = psAf.readContacts(fname,Order,resolution)
+				Order = psf.ChromIndexing(G)
+				allCon = psf.readContacts(fname,Order,resolution)
 				print '\tgenerate pre', out
-				M = psAf.JuiceboxPre(allCon,Order,resolution,out)
+				M = psf.JuiceboxPre(allCon,Order,resolution,out)
 				del allCon
 				print '\tpre writing', elp
 			R = RH[resolution]

@@ -1,8 +1,8 @@
 import sys
 import timeit
-import ArChER_func as af
+import lift_func as lf
 
-#reload(af)
+reload(lf)
 
 #
 #This utility transforms net-file to the more usefull (for ArChER) mark-file 
@@ -18,10 +18,10 @@ for line in lines:
 path = file[0]
 for flist in file[1:]:
 	for f in flist.split():
-		nP = af.netParser(path+f)
-		n2p = af.net2pre(nP, path+f)
+		nP = lf.netParser(path+f)
+		n2p = lf.net2pre(nP, path+f)
 		del nP
-		af.pre2mark(n2p, path+f)
+		lf.pre2mark(n2p, path+f)
 		del n2p
 		elp = timeit.default_timer() - start_time
 		print 'end converting:', file, elp

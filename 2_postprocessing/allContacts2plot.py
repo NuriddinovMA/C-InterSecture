@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib
 #matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import postArcher_func as psAf
-reload(psAf)
+import post_func as psf
+reload(psf)
 
 print 'Step 1: Initialization'
 start_time = timeit.default_timer()
@@ -34,7 +34,7 @@ for line in lines:
 			if Args.has_key(key) == True: Args[key].update( dict([ s.split(':') for s in args ]))
 			else: Args[key] = dict([ s.split(':') for s in args ])
 		elif key == 'synblocks_files': Args[key].append( dict([ s.split(':') for s in args ]) )
-		elif key == 'use_synblocks' or key == 'statistics' or key == 'use_pre' or key == 'use_loci': Args[key] = psAf.boolean(args[0])
+		elif key == 'use_synblocks' or key == 'statistics' or key == 'use_pre' or key == 'use_loci': Args[key] = psf.boolean(args[0])
 		else:
 			try: Args[key] = args[0]
 			except KeyError: pass
@@ -91,10 +91,10 @@ for sm in range(len(Args['samples'])):
 			print '\tstart contact analizying %s, %s, %.2f' % (Args['samples'][sm], file, elp)
 			resolution = int(s[2][:-2])*1000
 			order_path = '%s/%s' % (Args['chrom_path'],Args['chrom_sizes'][s[0]])
-			Order = psAf.ChromIndexing(order_path)
+			Order = psf.ChromIndexing(order_path)
 			loci = Args['loci'][s[0]]
-			allCon = psAf.readContacts(fname,Order,resolution)
-			lociCon = psAf.filterLoci(allCon,resolution,loci)
+			allCon = psf.readContacts(fname,Order,resolution)
+			lociCon = psf.filterLoci(allCon,resolution,loci)
 			del allCon
 			elp = timeit.default_timer() - start_time
 			print '\tend contact reading: %.2f' % elp
@@ -102,7 +102,7 @@ for sm in range(len(Args['samples'])):
 			for l in range(len(loci)):
 				elp = timeit.default_timer() - start_time
 				print '\tstart draw loci %s:%i-%i, time: %.2f' % (loci[l][0],loci[l][1],loci[l][2],elp)
-				Map = psAf.drawMap(lociCon[l],loci[l],resolution,1,1,3)
+				Map = psf.drawMap(lociCon[l],loci[l],resolution,1,1,3)
 				Ln = len(Map[6])
 				fig, ax = plt.subplots()
 				cmap = matplotlib.cm.ScalarMappable(cmap = 'autumn')

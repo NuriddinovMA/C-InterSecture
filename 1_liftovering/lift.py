@@ -1,6 +1,6 @@
 import sys
 import timeit
-import ArChER_func as Af
+import lift_func as lf
 
 Args = {
 	'contact_path':'','contact_files':'','genome_path':'','chrom_orders':'',
@@ -27,7 +27,7 @@ start_time = timeit.default_timer()
 print '\nStep 0: chromosome indexing...'
 l2i = []
 fname = [Args['genome_path']+Args['chrom_orders'][i] for i in range(2)]
-for i in range(2): l2i.append( Af.ChromIndexing(fname[i]) )
+for i in range(2): l2i.append( lf.ChromIndexing(fname[i]) )
 elp = timeit.default_timer() - start_time
 print '... chromosome indexing total time:', elp
 
@@ -36,7 +36,7 @@ contactList = []
 fname = [Args['contact_path']+Args['contact_files'][i] for i in range(2)]
 for i in range(2):
 	print '\t' + Args['contact_files'][i]
-	contactList.append( Af.iReadPercentelizedContact(fname[i],l2i[i]) )
+	contactList.append( lf.iReadPercentelizedContact(fname[i],l2i[i]) )
 	elp = timeit.default_timer() - start_time
 	print '... locus contact reading end time', elp, len(contactList[i])
 elp = timeit.default_timer() - start_time
@@ -47,7 +47,7 @@ MarkPoints = []
 rname = [Args['remap_path']+Args['remap_files'][i] for i in range(2)]
 for i in range (2):
 	print '\t', rname[i],
-	MarkPoints.append( Af.iReadingMarkPoints(rname[i],Args['resolution'],l2i[i],l2i[i-1]) )
+	MarkPoints.append( lf.iReadingMarkPoints(rname[i],Args['resolution'],l2i[i],l2i[i-1]) )
 	elp = timeit.default_timer() - start_time
 	print '\ %i mark point readed for %.2f sec' % (len(MarkPoints[i].keys()), elp)
 elp = timeit.default_timer() - start_time
@@ -58,12 +58,12 @@ fname = [Args['out_path']+Args['contact_files'][i] for i in range(2)]
 for i in range(2):
 	out_name = '%s.%s.allContacts' % (fname[i],Args['model'])
 	print '\tstart contact comparing...', out_name
-	Dif_Contact = Af.iDifferContact(contactList[i], contactList[1-i], MarkPoints[i], Args['resolution'], Args['model'],l2i[i-1])
+	Dif_Contact = lf.iDifferContact(contactList[i], contactList[1-i], MarkPoints[i], Args['resolution'], Args['model'],l2i[i-1])
 	elp = timeit.default_timer() - start_time
 	print '\tend contact comparing', elp
 	
 	print '\tDiffer contact writing'
-	Af.iPrintDifferContact(Dif_Contact, Args['resolution'], l2i[i], out_name)
+	lf.iPrintDifferContact(Dif_Contact, Args['resolution'], l2i[i], out_name)
 	print '\t\tdistant contact writing'
 	del Dif_Contact
 	elp = timeit.default_timer() - start_time
