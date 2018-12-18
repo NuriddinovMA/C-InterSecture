@@ -66,6 +66,7 @@ Ini-file contains all neaded paramaters to performing:
 **out_folder** - the path to output folder
 
 The output files are named as: *out_folder*/*sample_name*.*statistic*.*resolution*kb.*unmapped_bases*N.*covarage*C.*max_distance*Mb.initialContacts
+
 The preprocessed contacts are stored using a simple tab-delimited text format:
 ```chr1	/ pos1	/ chr2/ 	pos2 /	contact	/ min /	max /	cov1 /	cov2	/ dist```
 The *min* and *max* columns reflect a range of contact dispersion. The *cov1* and *cov2* columns reflect a Hi-C read coverage of contacted bin. The *dist* columns store a genome distance between contacted bins. If dist = -1000, this contact is interchromosomal.
