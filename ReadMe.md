@@ -28,7 +28,7 @@ After generation `.unmap`-files, can run the preprocessing:
 ```
 python pre.py < pre.ini
 ```
-Ini-file contains all neaded paramaters to performing (see example). 
+Ini-file contains all needed paramaters to performing (see example). 
 The preprocessed contacts (`.initialContacts`-files) are stored using a simple tab-delimited text format:
 ```
 chr1 \ pos1 \ chr2 \ pos2 \ contacts \ min \ max \ coverages1 \ coverages2 \ distances
@@ -49,7 +49,7 @@ or any others ways, for example, by formating a list of [conservative non-coding
 ```
 python lift.py < lift.ini
 ```
-Ini-file contains all neaded paramaters to performing ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-LIFT.ini)). The pipeline produce **two** `.allContacts`-files with liftovered contacts: species_1 to species_2 and species_2 to species_1. The lifovered contacts are stored using a simple tab-delimited text format:
+Ini-file contains all needed paramaters to performing ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-LIFT.ini)). The pipeline produce **two** `.allContacts`-files with liftovered contacts: species_1 to species_2 and species_2 to species_1. The lifovered contacts are stored using a simple tab-delimited text format:
 ```
 chr1_reference \ pos1_reference \ chr2_reference \ pos2_reference \ remap1_query \ remap2_query \ reference_contacts \ query_contacts \ reference_deviations \ query_deviations	\ reference_coverages \ query_coverages	\ query_contact_distances
 ```
@@ -57,8 +57,8 @@ chr1_reference \ pos1_reference \ chr2_reference \ pos2_reference \ remap1_query
 ### Postprocessing
 This step produces user-friendly ouput.
 
-`python allContacts2hic.py < hic.ini` - generates .hic-files for JuiceBox for full genome comparing, this option requires Juicer Tools;
+`python allContacts2hic.py < post.ini` - generates .hic-files for JuiceBox for full genome comparing, this option requires Juicer Tools;
 
-`python allContacts2plot.py < plot.ini` - generates a heat-map to given region reflected difference between a chromatin architecture of comparing species and statistical significance;
+`python allContacts2plot.py < post.ini` - generates a heat-map to given region reflected difference between a chromatin architecture of comparing species and statistical significance;
 
-`python allContacts2metric.py < metric.ini` - calcultate a quantitatively estimation of difference between a chromatin architecture of comparing species  and generate coresponded .bedGraph-files.
+`python allContacts2metric.py < post.ini` - calcultate a quantitatively estimation of difference between a chromatin architecture of comparing species  and generate coresponded .bedGraph-files.
