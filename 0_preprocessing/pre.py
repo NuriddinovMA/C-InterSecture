@@ -3,7 +3,7 @@ import timeit
 import pre_func as prf
 reload(prf)
 Args = {
-	'genome':'','chrom_order':'','sample_name':'','out_folder':'',
+	'genome':'','chrom_order':'','sample_name':'','out_path':'',
 	'raw_contacts':'', 'norm_contacts':'', 'genome_bins':'',
 	'statistic':'prc','resolution':10000, 'unmapped_bases':33,'coverage':1, 'max_distance':5
 }
@@ -23,7 +23,8 @@ for line in lines:
 
 
 suffix = '/%s.%s.%ikb.%iN.%iC.%iMb' % (Args['sample_name'],Args['statistic'],Args['resolution']/1000,Args['unmapped_bases'],Args['coverage'],Args['max_distance'])
-out_name = Args['out_folder'] + suffix
+
+out_name = Args['out_path'] + suffix
 #
 #This block indexes chromosomes and analyses bins by a unmapped_bases
 #
