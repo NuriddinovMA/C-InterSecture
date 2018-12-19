@@ -210,7 +210,7 @@ def pre2mark(preMark,name):
 							else: markPoints.append(mark)
 							mark = [ s[0],coor[0],coor[1],s[3],coor[2],coor[3] ]
 	f1 = open(name+'.mark', 'w')
-	print >> f1, 'chr1\tstart1\tend1\tchr2\tstart2\tend2'
+	print >> f1, 'chr_sp1\tstart1\tend1\tchr_sp2\tstart2\tend2'
 	for m in markPoints:
 		if len(m[0]) < 6 and len(m[3]) < 6 and (m[2]-m[1] > 15) and (abs(m[5] - m[4]) > 15): print >> f1, '%s\t%i\t%i\t%s\t%i\t%i' % (m[0],m[1],m[2],m[3],m[4],m[5])
 		else: pass
