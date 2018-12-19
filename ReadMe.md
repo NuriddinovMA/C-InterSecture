@@ -44,9 +44,13 @@ The synteny files (`.mark`) contain the mapping rules between the compared speci
 chr_sp1 \ start1 \ end1 \ chr_sp2 \ start2 \ end2
 ```
 The synteny map may be generated from `.net`-files [see UCSC pairwise alignments](http://hgdownload.soe.ucsc.edu/downloads.html) using 'net2mark.py' utilty: 
-```python net2mark.py < net.ini```
+```
+python net2mark.py < net.ini
+```
 or any others ways, for example, by formating a list of conservative non-coding elements ([ancora](http://ancora.genereg.net/downloads/)). The file `net.ini` includes a space/tab delimited list of `net.`-files ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-NET.ini)). After generation `.mark`-files, can run the contact lifovering:
-```python lift.py < lift.ini```
+```
+python lift.py < lift.ini
+```
 Ini-file contains all neaded paramaters to performing ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-LIFT.ini)). The pipeline produce **two** `.allContacts`-files with liftovered contacts: species_1 to species_2 and species_2 to species_1. The lifovered contacts are stored using a simple tab-delimited text format:
 ```
 chr1_reference \ pos1_reference \ chr2_reference \ pos2_reference \ remap1_query \ remap2_query \ reference_contacts \ query_contacts \ reference_deviations \ query_deviations	\ reference_coverages \ query_coverages	\ query_contact_distances
