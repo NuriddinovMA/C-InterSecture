@@ -33,9 +33,9 @@ python pre.py < pre.ini
 Ini-file contains all neaded paramaters to performing (see example). 
 The preprocessed contacts (`.initialContacts`-files) are stored using a simple tab-delimited text format:
 ```
-chr1 \ pos1 \ chr2 \ pos2 \ contacts \ min \ max \ coverages1 \ coverages2	\ distances
+chr1 \ pos1 \ chr2 \ pos2 \ contacts \ min \ max \ coverages1 \ coverages2 \ distances
 ```
-The *min* and *max* columns reflect a range of contact deviation. The *cov1* and *cov2* columns reflect a Hi-C read coverage of contacted bin. The *dist* columns store a genome distance between contacted bins. If distances = -1000, this contact is interchromosomal.
+The *min* and *max* columns reflect a range of contact deviation. The *coverages1* and *coverages2* columns reflect a Hi-C read coverage of contacted bin. The *distance* columns store a genome distance between contacted bins. If *distances* = -1000, this contact is interchromosomal.
 
 ### Contact liftovering
 This step requires a pair of `.initialContacts`-files from compared species and a pair of files containing synteny map. 
@@ -45,12 +45,9 @@ chr_sp1 \ start1 \ end1 \ chr_sp2 \ start2 \ end2
 ```
 The synteny map may be generated from `.net`-files [see UCSC pairwise alignments](http://hgdownload.soe.ucsc.edu/downloads.html) using 'net2mark.py' utilty: 
 ```python net2mark.py < net.ini```
-or any others ways, for example, a list of conservative non-coding elements ([ancora](http://ancora.genereg.net/downloads/)):
-The file `net.ini` includes a space/tab delimited list of `net.`-files ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-NET.ini)). After generation `.mark`-files, can run the contact lifovering:
+or any others ways, for example, by formating a list of conservative non-coding elements ([ancora](http://ancora.genereg.net/downloads/)). The file `net.ini` includes a space/tab delimited list of `net.`-files ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-NET.ini)). After generation `.mark`-files, can run the contact lifovering:
 ```python lift.py < lift.ini```
-Ini-file contains all neaded paramaters to performing ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-LIFT.ini)).
-The pipeline produce **two** `.allContacts`-files with liftovered contacts: species_1 to species_2 and species_2 to species_1.
-The lifoveres contacts are stored using a simple tab-delimited text format:
+Ini-file contains all neaded paramaters to performing ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-LIFT.ini)). The pipeline produce **two** `.allContacts`-files with liftovered contacts: species_1 to species_2 and species_2 to species_1. The lifovered contacts are stored using a simple tab-delimited text format:
 ```
 chr1_reference \ pos1_reference \ chr2_reference \ pos2_reference \ remap1_query \ remap2_query \ reference_contacts \ query_contacts \ reference_deviations \ query_deviations	\ reference_coverages \ query_coverages	\ query_contact_distances
 ```
