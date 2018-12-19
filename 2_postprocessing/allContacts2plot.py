@@ -13,7 +13,7 @@ start_time = timeit.default_timer()
 
 Args = {
 	'contact_path':'','samples':[],'contact_files':[],
-	'frame':[], 'loci': [], 'statistics': False,
+	'frame':[], 'use_loci':False, 'loci': [], 'statistics': False,
 	'chrom_path':'','chrom_sizes':{}, 
 	'use_synblocks':False, 'synblocks_path':'', 'synblocks_files':[],
 	'out_path':'','out_names':[]
