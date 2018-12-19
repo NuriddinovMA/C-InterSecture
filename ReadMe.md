@@ -63,5 +63,5 @@ This step produces user-friendly ouput.
 
 `python allContacts2metric.py < post.ini` - calcultate a quantitatively estimation of difference between a chromatin architecture of comparing species  and generate coresponded .bedGraph-files.
 
-Ini-file contains all needed paramaters to postcessing ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/2_postproccesing/EXAMPLE-POST.ini))
+Ini-file contains all needed paramaters to postprocessing ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/2_postprocessing/EXAMPLE-POST.ini))
 
