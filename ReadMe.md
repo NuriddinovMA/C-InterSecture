@@ -55,6 +55,7 @@ Ini-file contains all needed paramaters to processing ([see example](https://git
 ```
 chr1_reference \ pos1_reference \ chr2_reference \ pos2_reference \ remap1_query \ remap2_query \ reference_contacts \ query_contacts \ reference_deviations \ query_deviations	\ reference_coverages \ query_coverages	\ query_contact_distances
 ```
+**WARNING!** To avoid rewriting files, should create a indepandent folder for every species comparing. 
 
 ### Postprocessing
 This step produces user-friendly ouput.
