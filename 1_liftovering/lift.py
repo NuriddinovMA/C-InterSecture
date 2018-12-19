@@ -54,6 +54,8 @@ elp = timeit.default_timer() - start_time
 print '... mark point reading total time:', elp
 
 print '\nStep 3: start contact comparing...'
+try: os.makedirs(Args['out_path'])
+except OSError: pass
 fname = [Args['out_path']+Args['contact_files'][i] for i in range(2)]
 for i in range(2):
 	out_name = '%s.%s.allContacts' % (fname[i],Args['model'])
