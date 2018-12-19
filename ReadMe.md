@@ -45,7 +45,7 @@ The synteny map may be generated from `.net`-files [see UCSC pairwise alignments
 ```
 python net2mark.py < net.ini
 ```
-or any others ways, for example, by formating a list of conservative non-coding elements ([ancora](http://ancora.genereg.net/downloads/)). The file `net.ini` includes a space/tab delimited list of `net.`-files ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-NET.ini)). After generation `.mark`-files, can run the contact lifovering:
+or any others ways, for example, by formating a list of [conservative non-coding elements](http://ancora.genereg.net/downloads/). The file `net.ini` includes a space/tab delimited list of `net.`-files ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-NET.ini)). After generation `.mark`-files, can run the contact lifovering:
 ```
 python lift.py < lift.ini
 ```
