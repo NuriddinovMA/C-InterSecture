@@ -49,7 +49,7 @@ After generation `.mark`-files, can run the contact lifovering:
 ```
 python lift.py < lift.ini
 ```
-Ini-file contains all needed paramaters ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-LIFT.ini)). The pipeline produces **two** `.allContacts`-files with liftovered contacts: species_1 to species_2 and species_2 to species_1. The lifovered contacts are stored using a simple tab-delimited text format:
+Ini-file contains all needed parameters ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-LIFT.ini)). The pipeline produces **two** `.allContacts`-files with liftovered contacts: species_1 to species_2 and species_2 to species_1. The lifovered contacts are stored using a simple tab-delimited text format:
 ```
 chr1_reference \ pos1_reference \ chr2_reference \ pos2_reference \ remap1_query \ remap2_query \ reference_contacts \ query_contacts \ reference_deviations \ query_deviations	\ reference_coverages \ query_coverages	\ query_contact_distances
 ```
@@ -64,4 +64,4 @@ This step produces user-friendly output.
 
 `python allContacts2metric.py < post.ini` - calculate a quantitative estimation of differences between a chromatin architecture of comparing species and generate corresponded .bedGraph-files.
 
-Ini-file contains all needed paramaters to visualize results ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/2_postprocessing/EXAMPLE-POST.ini)).
+Ini-file contains all needed parameters to visualize results ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/2_postprocessing/EXAMPLE-POST.ini)).
