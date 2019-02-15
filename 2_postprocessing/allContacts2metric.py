@@ -55,22 +55,23 @@ elif len(Args['out_names']) == 1:
 else:
 	print "Error! Number of 'out_names' must correspond to number of samples"
 
-L = []
-
-for l in Args['loci']:
-	parse = l.split(':')
-	key = parse[0]
-	try:
-		chrm = parse[1]
-		start,end = parse[2].split('-')
-		start,end = int(start),int(end)
-		L.append((key,chrm,start,end) )
-	except IndexError: pass
-Args['loci'] = {}
-for l in L: 
-	if Args['loci'].has_key(l[0]) == True: Args['loci'][l[0]].append( l[1:] )
-	else: Args['loci'][l[0]] = [ l[1:], ]
-del L
+if Args['use_loci'] == True:
+	L = []
+	for l in Args['loci']:
+		parse = l.split(':')
+		key = parse[0]
+		try:
+			chrm = parse[1]
+			start,end = parse[2].split('-')
+			start,end = int(start),int(end)
+			L.append((key,chrm,start,end) )
+		except IndexError: pass
+	Args['loci'] = {}
+	for l in L: 
+		if Args['loci'].has_key(l[0]) == True: Args['loci'][l[0]].append( l[1:] )
+		else: Args['loci'][l[0]] = [ l[1:], ]
+	del L
+else: Args['loci'] = []
 for key in Args.keys(): print '\t%s =' % key, Args[key]
 
 c = 0
