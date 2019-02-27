@@ -398,7 +398,9 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 						else: pass
 		else: pass
 	f = open(stat_out+'.stat','w')
-	for i in range(5): print >> stat_out, Statistic[0][i],Statistic[1][i],len(set(Statistic[2][i]))
+	for i in range(5): Statistic[2][i] = len(set(Statistic[2][i]))
+	Statistic[2][1] += Statistic[2][4]
+	for i in range(5): print >> f, Statistic[0][i],Statistic[1][i],Statistic[2][i]
 	del Statistic
 	return DifferContact
 
