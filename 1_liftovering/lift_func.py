@@ -334,7 +334,7 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 			c = [0,0,0,0,0,set(),set()]
 			if end1 == 0: print "remapping error!!!", ObjCoorMP[key1]
 			if end2 == 0: print "remapping error!!!", ObjCoorMP[key2]
-			Statistic[1] += 1
+			Statistic[1][1] += 1
 			for j1 in range(end1):
 				for j2 in range(end2):
 					c = [0,0,0,0,0,set(),set()]
