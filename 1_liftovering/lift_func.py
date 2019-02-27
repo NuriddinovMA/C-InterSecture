@@ -322,19 +322,24 @@ def iDifferContactStat(Contact_disp_0, Contact_disp_1, ObjCoorMP, model):
 
 def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model, ChrIdxs2,stat_out):
 	DifferContact = {}
-	Statistic = ['all','remappable','remapped','processed','duplicated'],[0,0,0,0,0,0,0]
+	Statistic = ['all','remappable','remapped','processed','duplicated'],[0,0,0,0,0],[[],[],[],[],[]]
 	for i in Contact_disp_0:
 		key1 = i[:2]
 		key2 = i[2:]
 		Statistic[1][0] += 1
+		Statistic[2][0] += [key1,key2,]
 		if (HashTry(ObjCoorMP, key1) == 1) and (HashTry(ObjCoorMP, key2) == 1):
 			end1 = len(ObjCoorMP[key1])
 			end2 = len(ObjCoorMP[key2])
 			k = 0
 			c = [0,0,0,0,0,set(),set()]
-			if end1 == 0: print "remapping error!!!", ObjCoorMP[key1]
-			if end2 == 0: print "remapping error!!!", ObjCoorMP[key2]
 			Statistic[1][1] += 1
+			if end1 == 0: print "remapping error!!!", ObjCoorMP[key1]
+			elif end1 == 1: Statistic[2][1] += [key1,]
+			else: Statistic[2][4] += [key1,]
+			if end2 == 0: print "remapping error!!!", ObjCoorMP[key2]
+			elif end2 == 1: Statistic[2][1] += [key2,]
+			else: Statistic[2][4] += [key2,]
 			for j1 in range(end1):
 				for j2 in range(end2):
 					c = [0,0,0,0,0,set(),set()]
@@ -364,10 +369,12 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 					if k == 0: pass
 					else:
 						Statistic[1][2] += 1
+						Statistic[2][2] += [key1,key2,]
 						if model != 'balanced': norm = 1
 						else: norm = c[4]
 						if c[4] != 0:
 							Statistic[1][3] += 1
+							Statistic[2][3] += [key1,key2,]
 							cc = (
 								int(round((c[0])/norm)), 
 								int(round((c[1])/norm)), 
@@ -385,12 +392,13 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 							if HashTry(DifferContact,i) == 0: DifferContact[i] = (iLabel(cc[4],resolution,ChrIdxs2)[:-1], iLabel(cc[5],resolution,ChrIdxs2)[:-1], Contact_disp_0[i][0], cc[0], disp1, disp2, Contact_disp_0[i][3], Contact_disp_0[i][4], cc[3])
 							else:
 								Statistic[1][4] += 1
+								#Statistic[2][4] += [key1,key2,] 
 								if DifferContact[i][-1] < cc[3] or cc[3] <= 0 : pass
 								else: DifferContact[i] = ( iLabel(cc[4],resolution,ChrIdxs2)[:-1], iLabel(cc[5],resolution,ChrIdxs2)[:-1], Contact_disp_0[i][0], cc[0], disp1, disp2, Contact_disp_0[i][3], Contact_disp_0[i][4], cc[3] )
 						else: pass
 		else: pass
 	f = open(stat_out+'.stat','w')
-	for i in range(5): print >> stat_out, Statistic[0][i],Statistic[1][i]
+	for i in range(5): print >> stat_out, Statistic[0][i],Statistic[1][i],len(set(Statistic[2][i]))
 	del Statistic
 	return DifferContact
 
