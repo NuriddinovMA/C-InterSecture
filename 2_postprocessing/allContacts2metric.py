@@ -3,20 +3,20 @@ import sys
 import timeit
 import numpy as np
 import matplotlib
-#matplotlib.use('Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import post_func as psf
-reload(psf)
+import postArcher_func as psAf
+reload(psAf)
 
 print 'Step 1: Initialization'
 start_time = timeit.default_timer()
 
 Args = {
 	'contact_path':'','samples':[],'contact_files':[],
-	'frame':[], 'use_loci':False, 'loci':[], 'statistics': False,
+	'frame':[], 'use_loci': False,'loci': [], 'statistics': False, 'metric': 'pbad',
 	'chrom_path':'','chrom_sizes':{}, 
 	'use_synblocks':False, 'synblocks_path':'', 'synblocks_files':[],
-	'out_path':'','out_names':[]
+	'out_path':'','out_names':''
 }
 
 lines = sys.stdin.readlines()
@@ -28,13 +28,13 @@ for line in lines:
 	except IndexError: pass
 	else:
 		if key == 'frame': Args[key] = [ int(s) for s in args ]
-		elif key == 'contact_files': Args[key].append( [ s for s in args ] )
-		elif key == 'samples' or key == 'out_names' or key == 'loci': Args[key].extend( [ s for s in args ] )
+		elif key == 'contact_files' or key == 'loci': Args[key].append( [ s for s in args ] )
+		elif key == 'samples' or key == 'out_names': Args[key] = [ s for s in args ]
 		elif key == 'chrom_sizes':
 			if Args.has_key(key) == True: Args[key].update( dict([ s.split(':') for s in args ]))
 			else: Args[key] = dict([ s.split(':') for s in args ])
 		elif key == 'synblocks_files': Args[key].append( dict([ s.split(':') for s in args ]) )
-		elif key == 'use_synblocks' or key == 'statistics' or key == 'use_pre' or key == 'use_loci': Args[key] = psf.boolean(args[0])
+		elif key == 'use_synblocks' or key == 'statistics' or key == 'use_pre' or key == 'use_loci': Args[key] = psAf.boolean(args[0])
 		else:
 			try: Args[key] = args[0]
 			except KeyError: pass
@@ -49,9 +49,7 @@ if len(Args['contact_files']) != len(Args['samples']):
 
 if len(Args['out_names']) == 0: Args['out_names'] = Args['samples']
 elif len(Args['out_names']) == len(Args['samples']): pass
-elif len(Args['out_names']) == 1: 
-	Args['out_names'] *= len(Args['samples'])
-	print "Attention! All output files share the prefix!"
+elif len(Args['out_names']) == 1: print "Attention! All output files share the prefix!"
 else:
 	print "Error! Number of 'out_names' must correspond to number of samples"
 
@@ -74,8 +72,10 @@ if Args['use_loci'] == True:
 else: Args['loci'] = []
 for key in Args.keys(): print '\t%s =' % key, Args[key]
 
+elp = timeit.default_timer() - start_time
 c = 0
-colorList = psf.colorList(27)
+if Args['metric'] == 'pearsone' or  Args['metric'] == 'spearman': tail = 'equ'
+else: tail = 'prc'
 print 'Step 2: Analyzing'
 for sm in range(len(Args['samples'])):
 	if Args['contact_files'][sm][0] == 'all' or Args['contact_files'][sm][0][:3] == 'key': files = os.listdir( '%s/%s/' % (Args['contact_path'],Args['samples'][sm]))
@@ -83,16 +83,17 @@ for sm in range(len(Args['samples'])):
 	if Args['contact_files'][sm][0][:3] == 'key':
 		for fi in range(len(files)-1,-1,-1):
 			if files[fi].find(Args['contact_files'][sm][0][4:]) == -1: del files[fi]
+	colorList = psAf.colorList(len(files))
 	for file in files:
 		s = file.split('.')
 		fname = '%s/%s/%s' % (Args['contact_path'],Args['samples'][sm],file)
-		if Args['chrom_sizes'].has_key(s[0]) == True and s[-1] == 'allContacts' and s[1] == 'prc':
+		if Args['chrom_sizes'].has_key(s[0]) == True and s[-1] == 'allContacts' and s[1] == tail:
 			elp = timeit.default_timer() - start_time
 			print '\tstart contact analizying %s, %s, %.2f' % (Args['samples'][sm], file, elp)
 			resolution = int(s[2][:-2])*1000
 			order_path = '%s/%s' % (Args['chrom_path'],Args['chrom_sizes'][s[0]])
-			Order = psf.ChromIndexing(order_path)
-			allCon = psf.readContacts(fname,Order,resolution)
+			Order = psAf.ChromIndexing(order_path)
+			allCon = psAf.readContacts(fname,Order,resolution)
 			elp = timeit.default_timer() - start_time
 			print '\tend contact reading: %.2f' % elp
 			print '\tstart metric calculation'
@@ -102,15 +103,15 @@ for sm in range(len(Args['samples'])):
 				print '\t\tstart %i bin frame calculation' %  frame
 				if Args['use_synblocks'] == True: 
 					syn_path = '%s/%s' % (Args['synblocks_path'],Args['synblocks_files'][sm][s[0]])
-					SB = psf.readSynBlocks2(syn_path,resolution,frame+1)
+					SB = psAf.readSynBlocks2(syn_path,resolution,frame+1)
 				else: SB = False
 				#out_stat = '%s/%s_%s.%iframe.metric.stat' % (Args['out_path'],Args['out_names'][sm],file[:-12],frame)
-				M = psf.metricCalc(allCon,resolution,frame=frame,synblocks=SB)
+				M = psAf.metricCalc(allCon,resolution,frame=frame,synblocks=SB,metric=Args['metric'])
 				M.sort(key=lambda x: Order[x[0]])
 				elp = timeit.default_timer() - start_time
 				print '\t\tmetric for %i bin frame calculation: %.2f sec' % ( frame, elp)
 				if Args['statistics'] != 'only':
-					out = '%s/%s_%s.%iframe.metric.bedGraph' % (Args['out_path'],Args['out_names'][sm],file[:-12],frame)
+					out = '%s/%s_%s.%s.%iframe.metric.bedGraph' % (Args['out_path'],Args['out_names'][sm],file[:-12],Args['metric'],frame)
 					f = open(out,'w')
 					for m in M: 
 						L.append(m[3])
@@ -128,11 +129,11 @@ for sm in range(len(Args['samples'])):
 				print '\t\tmetric for %i bin frame calculating: %.2f sec' % ( frame, elp)
 				if Args['statistics'] != False:
 					print '\t\tstart calulating metric for randomized contacts'
-					randCon = psf.randomizeContacts(allCon)
+					randCon = psAf.randomizeContacts(allCon)
 					elp = timeit.default_timer() - start_time
 					print '\t\tcontact randomizing: %.2f sec' % elp
 					L = []
-					M = psf.metricCalc(randCon,resolution,frame=frame,synblocks=SB)
+					M = psAf.metricCalc(randCon,resolution,frame=frame,synblocks=SB,metric=Args['metric'])
 					del randCon
 					M.sort(key=lambda x: Order[x[0]])
 					for m in M: L.append(m[3])
@@ -152,4 +153,4 @@ for sm in range(len(Args['samples'])):
 		c += 1
 if Args['statistics'] != False:
 	plt.legend(fontsize=6)
-	plt.savefig( Args['out_path'] + '/' + Args['out_names'][sm] + '.stat.png',dpi=112)
+	plt.savefig('%s/%s.%s.stat.png' % (Args['out_path'],Args['out_names'][sm],Args['metric']),dpi=400)

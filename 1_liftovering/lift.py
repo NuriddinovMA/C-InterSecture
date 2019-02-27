@@ -1,3 +1,4 @@
+import os
 import sys
 import timeit
 import lift_func as lf
@@ -60,7 +61,7 @@ fname = [Args['out_path']+Args['contact_files'][i] for i in range(2)]
 for i in range(2):
 	out_name = '%s.%s.allContacts' % (fname[i],Args['model'])
 	print '\tstart contact comparing...', out_name
-	Dif_Contact = lf.iDifferContact(contactList[i], contactList[1-i], MarkPoints[i], Args['resolution'], Args['model'],l2i[i-1])
+	Dif_Contact = lf.iDifferContact(contactList[i], contactList[1-i], MarkPoints[i], Args['resolution'], Args['model'],l2i[i-1],fname)
 	elp = timeit.default_timer() - start_time
 	print '\tend contact comparing', elp
 	

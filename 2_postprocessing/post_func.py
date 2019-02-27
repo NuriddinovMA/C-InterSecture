@@ -2,6 +2,7 @@ import math
 import timeit
 import sys
 import numpy as np
+import scipy.stats as st
 
 def boolean(x):
 	if x == 'False' or x == 'false': return False
@@ -24,7 +25,6 @@ def colorList(*args):
 		for j in range(0,256,step):
 			for k in range(0,256,step): color.append( (i/255.,j/255.,k/255.) )
 	return color
-
 
 def ChromIndexing(path):
 	ChrInd = {}
@@ -174,7 +174,7 @@ def randomizeContacts(Contacts,**kwargs):
 		np.random.shuffle(shuffle)
 		for i in range(len(Keys)):
 			D = [Contacts[Keys[i]][0],Contacts[Keys[i]][1],Contacts[Keys[i]][2],Contacts[Keys[i]][3],Contacts[Keys[i]][-1]]
-			D[i] = shuffle[i]
+			D[idx] = shuffle[i]
 			randCon[Keys[i]] = D
 	return randCon
 
@@ -219,7 +219,6 @@ def drawStat(Scale1,Scale2,conf):
 		if size > 100: size = 100
 		Map[1].append( int(size) )
 	return Map
-
 
 def JuiceboxPre(Contacts,Order,resolution,out):
 	Keys = Contacts.keys()
@@ -327,6 +326,11 @@ def filterBED(BED1,BED2,threshold,frame):
 def metricCalc(contacts,resolution,**kwargs):
 	Keys = set([])
 	metric = []
+	try: funckey=kwargs['metric']
+	except KeyError: funckey = 'pbad'
+	if funckey == 'pearsone': func = _metricCalcPearsone
+	elif funckey == 'spearman': func = _metricCalcSpearman
+	else: func = _metricCalc
 	try: frame=kwargs['frame']
 	except KeyError: frame = 8
 	try: synblocks=kwargs['synblocks']
@@ -343,13 +347,13 @@ def metricCalc(contacts,resolution,**kwargs):
 			if synblocks == False or synblocks.has_key(key) == True:
 				locus = key[0],key[1],key[1]+1
 				locusKeys = [(key[0],i) for i in range(key[1]-frame,key[1]+frame+1)]
-				metric.append( _metricCalc(contacts,locus,locusKeys,max_dist,frame ) )
+				metric.append( func(contacts,locus,locusKeys,max_dist,frame ) )
 			else: pass
 	else:
 		for locus in loci:
 			for key in [(locus[0],i) for i in range(locus[1]/resolution,locus[2]/resolution+1)]: locusKeys.add( key )
 			locusKeys = sorted(Keys)
-			metric.append( _metricCalc(contacts,locus,locusKeys,max_dist,0) )
+			metric.append( func(contacts,locus,locusKeys,max_dist,0) )
 	for i in range(len(metric)-1,-1,-1): 
 		if metric[i] == None: del metric[i]
 	return metric
@@ -376,10 +380,55 @@ def _metricCalc(contacts,locus,locusKeys,max_dist,frame):
 					if ds2 == 1: ds2 = 0.99
 					I += -1*dp*np.log10( ds1*ds2 )
 					n += 1
-		if n > threshold: 
-			metric = locus[0],locus[1],locus[2],I/n
-			return metric
-		else: pass #metric = locus[0],locus[1],locus[2],0
+	if n > threshold: 
+		metric = locus[0],locus[1],locus[2],I/n
+		return metric
+	else: pass #metric = locus[0],locus[1],locus[2],0
+
+def _metricCalcPearsone(contacts,locus,locusKeys,max_dist,frame):
+	I = 0.0
+	n = 0
+	threshold = 1.5*frame**2
+	x = []
+	y = []
+	for j in locusKeys:
+		for k in locusKeys:
+			if abs(j[1] - k[1]) > max_dist: pass
+			else: 
+				try: 
+					p1 = contacts[j+k][0]
+					p2 = contacts[j+k][1]
+				except KeyError: pass
+				else:
+					x.append(p1)
+					y.append(p2)
+	if len(x) > threshold: 
+		metric = locus[0],locus[1],locus[2],np.corrcoef(x,y)[0,1]
+		return metric
+	else: pass #metric = locus[0],locus[1],locus[2],0
+
+def _metricCalcSpearman(contacts,locus,locusKeys,max_dist,frame):
+	I = 0.0
+	n = 0
+	threshold = 1.5*frame**2
+	x = []
+	y = []
+	for j in locusKeys:
+		for k in locusKeys:
+			if abs(j[1] - k[1]) > max_dist: pass
+			else: 
+				try: 
+					p1 = contacts[j+k][0]
+					p2 = contacts[j+k][1]
+				except KeyError: pass
+				else:
+					x.append(p1)
+					y.append(p2)
+	if len(x) > threshold: 
+		metric = locus[0],locus[1],locus[2],st.spearmanr(x,y)[0]
+		return metric
+	else: pass #metric = locus[0],locus[1],locus[2],0
+#
 
 #
 #multy-species synteny
