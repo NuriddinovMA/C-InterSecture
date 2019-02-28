@@ -61,11 +61,13 @@ def iSparseMatrixReader(path, binIdxs, unBinHash, **kwargs):
 	except KeyError: raw = True
 	try: coverage = kwargs['coverage']
 	except KeyError: coverage = 1
+	try: inter = Args['inter']
+	except KeyError: inter = False
 	if raw == True: 
 		contactHash = _iRawSparceMatrixReader(path,binIdxs,unBinHash,int)
 		contactHash = _iContactFiltring(contactHash,unBinHash,coverage)
 	else: 
-		contactHash = _iNormedSparceMatrixReader(path,binIdxs,float)
+		contactHash = _iNormedSparceMatrixReader(path,binIdxs,float,inter)
 		contactHash = _iMatrixNorming(contactHash,unBinHash)
 	return contactHash
 
@@ -106,7 +108,7 @@ def _iRawSparceMatrixReader(path,binIdxs,unBinHash,format):
 		except TypeError: pass
 	return contactHash
 
-def _iNormedSparceMatrixReader(path,binIdxs,format):
+def _iNormedSparceMatrixReader(path,binIdxs,format,_inter):
 	start_time = timeit.default_timer()
 	contactHash = [{},{}]
 	f = open(path,'r')
@@ -122,16 +124,18 @@ def _iNormedSparceMatrixReader(path,binIdxs,format):
 			s0 = binIdxs[int(parse[0])]
 			s1 = binIdxs[int(parse[1])]
 			c = format(parse[2])
-			if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
-				if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
-				else: contactHash[0][s0+s1] += c
+			if (s0[0] != s1[0]) and (_inter == False): pass
 			else:
-				if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
-				else: contactHash[0][s1+s0] += c
-			if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
-			else: contactHash[1][s0] += c
-			if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
-			else: contactHash[1][s1] += c
+				if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
+					if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
+					else: contactHash[0][s0+s1] += c
+				else:
+					if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
+					else: contactHash[0][s1+s0] += c
+				if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
+				else: contactHash[1][s0] += c
+				if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
+				else: contactHash[1][s1] += c
 			if (ln-i) % 10000000 == 0:
 				elp = timeit.default_timer() - start_time
 				print '\t\tnormed sparse matrix parsing progress: %i, time elapsed: %.2f, memory sized: %.2fMb' % (ln-i, elp, 1.0*sys.getsizeof(contactHash)/1024/1024 )

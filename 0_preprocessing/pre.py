@@ -54,7 +54,7 @@ elp = timeit.default_timer() - start_time
 print '\t%i contact analyzing for %.2f sec; memory sized: %.2f Mb' % (len(rawContactHash[1]), elp, 1.0*sys.getsizeof(rawContactHash)/1024/1024)
 
 print '\nStep 2: Analyzing normalized marix for resolution %ikb... ' % (Args['resolution']/1000)
-normContactHash = prf.iSparseMatrixReader(Args['norm_contacts'], binIdxs, ubh, raw=False)
+normContactHash = prf.iSparseMatrixReader(Args['norm_contacts'], binIdxs, ubh, raw=False,inter=Args['inter'])
 elp = timeit.default_timer() - start_time
 print '\t%i normalized matrix reading tume: %.2f sec; memory sized: %.2f Mb' % (len(normContactHash),elp, sys.getsizeof(normContactHash )/1024.0/1024.0 )
 #H1 = set( normContactHash.keys() )
