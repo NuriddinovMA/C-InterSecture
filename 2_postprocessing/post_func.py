@@ -94,7 +94,7 @@ def readContacts(file, Order, resolution, **kwargs):
 			c = float(parse[-7])
 			q = float(parse[-6])
 			dr = float(parse[-5])
-			dq =  float(parse[-4])
+			dq = float(parse[-4])
 			l = float(parse[-1])
 			if HashTry(Contacts, key) == 0: Contacts[key] = [c,q,dr,dq,l]
 			else:

@@ -91,14 +91,14 @@ for sm in range(len(Args['samples'])):
 		out = '%s/%s_%s' % (Args['out_path'],Args['out_names'][sm],file[:-12])
 		print 'read file', fname
 		print 'out file', out
-		if Args['chrom_sizes'].has_key(s[0]) == True and s[-1] == 'allContacts':
+		if Args['chrom_sizes'].has_key(s[0]) == True and s[-1] == 'liftContacts':
 			resolution = int(s[2][:-2])*1000
 			G = '%s/%s' % (Args['chrom_path'],Args['chrom_sizes'][s[0]])
 			if Args['use_pre'] == True:
 				try:
-					f = open(out + 'Reference.pre')
+					f = open(out + '.Observed.pre')
 					f.close()
-					f = open(out + 'Query.pre')
+					f = open(out + '.Control.pre')
 					f.close()
 				except IOError:
 					print '\tpre not found!'
@@ -112,10 +112,10 @@ for sm in range(len(Args['samples'])):
 				del allCon
 				print '\tpre writing', elp
 			R = RH[resolution]
-			F = out + '.Reference.pre'
-			O = out + '.Reference.hic'
+			F = out + '.Observed.pre'
+			O = out + '.Observed.hic'
 			os.system( command + " " + F + " " + O + " " + G + " " + "-r" + " " + R + " "+ "-n")
-			F = out + '.Query.pre'
-			O = out + '.Query.hic'
+			F = out + '.Control.pre'
+			O = out + '.Control.hic'
 			os.system( command + " " + F + " " + O + " " + G + " " + "-r" + " " + R + " "+ "-n")
 		else: pass

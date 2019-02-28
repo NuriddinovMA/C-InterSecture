@@ -59,7 +59,7 @@ try: os.makedirs(Args['out_path'])
 except OSError: pass
 fname = [Args['out_path']+Args['contact_files'][i] for i in range(2)]
 for i in range(2):
-	out_name = '%s.%s.allContacts' % (fname[i],Args['model'])
+	out_name = '%s.%s.liftContacts' % (fname[i],Args['model'])
 	print '\tstart contact comparing...', out_name
 	Dif_Contact = lf.iDifferContact(contactList[i], contactList[1-i], MarkPoints[i], Args['resolution'], Args['model'],l2i[i-1],fname[i])
 	elp = timeit.default_timer() - start_time
