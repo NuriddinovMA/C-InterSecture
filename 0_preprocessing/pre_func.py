@@ -61,7 +61,7 @@ def iSparseMatrixReader(path, binIdxs, unBinHash, **kwargs):
 	except KeyError: raw = True
 	try: coverage = kwargs['coverage']
 	except KeyError: coverage = 1
-	try: inter = Args['inter']
+	try: inter = kwargs['inter']
 	except KeyError: inter = False
 	if raw == True: 
 		contactHash = _iRawSparceMatrixReader(path,binIdxs,unBinHash,int)
