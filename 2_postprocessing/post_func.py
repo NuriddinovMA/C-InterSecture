@@ -5,8 +5,8 @@ import numpy as np
 import scipy.stats as st
 
 def boolean(x):
-	if x == 'False' or x == 'false': return False
-	elif x == 'True' or x == 'true': return True
+	if x == 'False' or x == 'false' or x == 'f' or x == 'F': return False
+	elif x == 'True' or x == 'true' or x == 't' or x == 'T': return True
 	else: return x
 
 def HashTry(Hash, key):

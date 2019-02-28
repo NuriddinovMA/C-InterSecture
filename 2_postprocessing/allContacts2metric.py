@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import postArcher_func as psAf
-reload(psAf)
+import post_func as psf
+reload(psf)
 
 print 'Step 1: Initialization'
 start_time = timeit.default_timer()
@@ -34,7 +34,7 @@ for line in lines:
 			if Args.has_key(key) == True: Args[key].update( dict([ s.split(':') for s in args ]))
 			else: Args[key] = dict([ s.split(':') for s in args ])
 		elif key == 'synblocks_files': Args[key].append( dict([ s.split(':') for s in args ]) )
-		elif key == 'use_synblocks' or key == 'statistics' or key == 'use_pre' or key == 'use_loci': Args[key] = psAf.boolean(args[0])
+		elif key == 'use_synblocks' or key == 'statistics' or key == 'use_pre' or key == 'use_loci': Args[key] = psf.boolean(args[0])
 		else:
 			try: Args[key] = args[0]
 			except KeyError: pass
@@ -83,7 +83,7 @@ for sm in range(len(Args['samples'])):
 	if Args['contact_files'][sm][0][:3] == 'key':
 		for fi in range(len(files)-1,-1,-1):
 			if files[fi].find(Args['contact_files'][sm][0][4:]) == -1: del files[fi]
-	colorList = psAf.colorList(len(files))
+	colorList = psf.colorList(len(files))
 	for file in files:
 		s = file.split('.')
 		fname = '%s/%s/%s' % (Args['contact_path'],Args['samples'][sm],file)
@@ -92,8 +92,8 @@ for sm in range(len(Args['samples'])):
 			print '\tstart contact analizying %s, %s, %.2f' % (Args['samples'][sm], file, elp)
 			resolution = int(s[2][:-2])*1000
 			order_path = '%s/%s' % (Args['chrom_path'],Args['chrom_sizes'][s[0]])
-			Order = psAf.ChromIndexing(order_path)
-			allCon = psAf.readContacts(fname,Order,resolution)
+			Order = psf.ChromIndexing(order_path)
+			allCon = psf.readContacts(fname,Order,resolution)
 			elp = timeit.default_timer() - start_time
 			print '\tend contact reading: %.2f' % elp
 			print '\tstart metric calculation'
@@ -103,10 +103,10 @@ for sm in range(len(Args['samples'])):
 				print '\t\tstart %i bin frame calculation' %  frame
 				if Args['use_synblocks'] == True: 
 					syn_path = '%s/%s' % (Args['synblocks_path'],Args['synblocks_files'][sm][s[0]])
-					SB = psAf.readSynBlocks2(syn_path,resolution,frame+1)
+					SB = psf.readSynBlocks2(syn_path,resolution,frame+1)
 				else: SB = False
 				#out_stat = '%s/%s_%s.%iframe.metric.stat' % (Args['out_path'],Args['out_names'][sm],file[:-12],frame)
-				M = psAf.metricCalc(allCon,resolution,frame=frame,synblocks=SB,metric=Args['metric'])
+				M = psf.metricCalc(allCon,resolution,frame=frame,synblocks=SB,metric=Args['metric'])
 				M.sort(key=lambda x: Order[x[0]])
 				elp = timeit.default_timer() - start_time
 				print '\t\tmetric for %i bin frame calculation: %.2f sec' % ( frame, elp)
@@ -129,11 +129,11 @@ for sm in range(len(Args['samples'])):
 				print '\t\tmetric for %i bin frame calculating: %.2f sec' % ( frame, elp)
 				if Args['statistics'] != False:
 					print '\t\tstart calulating metric for randomized contacts'
-					randCon = psAf.randomizeContacts(allCon)
+					randCon = psf.randomizeContacts(allCon)
 					elp = timeit.default_timer() - start_time
 					print '\t\tcontact randomizing: %.2f sec' % elp
 					L = []
-					M = psAf.metricCalc(randCon,resolution,frame=frame,synblocks=SB,metric=Args['metric'])
+					M = psf.metricCalc(randCon,resolution,frame=frame,synblocks=SB,metric=Args['metric'])
 					del randCon
 					M.sort(key=lambda x: Order[x[0]])
 					for m in M: L.append(m[3])

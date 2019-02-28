@@ -11,6 +11,11 @@ def HashTry(Hash, key):
 	except KeyError: t = 0
 	return t
 
+def boolean(x):
+	if x == 'False' or x == 'false' or x == 'f' or x == 'F': return False
+	elif x == 'True' or x == 'true' or x == 't' or x == 'T': return True
+	else: return x
+
 def unmappedBasesBin(path, resolution, ChrInd, threshold):
 	ubh = {}
 	f = open(path+'.%i.unmap' % resolution,'r')

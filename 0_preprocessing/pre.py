@@ -5,7 +5,7 @@ reload(prf)
 Args = {
 	'genome':'','chrom_order':'','sample_name':'','out_path':'',
 	'raw_contacts':'', 'norm_contacts':'', 'genome_bins':'',
-	'statistic':'prc','resolution':10000, 'unmapped_bases':33,'coverage':1, 'max_distance':5
+	'statistic':'prc','resolution':10000, 'unmapped_bases':33,'coverage':1, 'max_distance':5, 'inter': False
 }
 
 lines = sys.stdin.readlines()
@@ -20,7 +20,7 @@ for line in lines:
 		try: Args[key] = int(args)
 		except ValueError: Args[key] = args
 		except KeyError: pass
-
+Args['inter'] == prf.boolean(Args['inter'])
 
 suffix = '/%s.%s.%ikb.%iN.%iC.%iMb' % (Args['sample_name'],Args['statistic'],Args['resolution']/1000,Args['unmapped_bases'],Args['coverage'],Args['max_distance'])
 
