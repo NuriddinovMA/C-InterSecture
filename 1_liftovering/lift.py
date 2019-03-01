@@ -6,7 +6,7 @@ import lift_func as lf
 Args = {
 	'contact_path':'','contact_files':'','genome_path':'','chrom_orders':'',
 	'remap_path':'','remap_files':'','out_path':'',
-	'resolution':50000,'agg_frame':[150000],'model':'balanced','dups_filter': 'length'
+	'resolution':50000,'agg_frame':[150000],'model':'balanced','inter': False,'dups_filter': 'length'
 }
 
 lines = sys.stdin.readlines()
@@ -25,6 +25,8 @@ for line in lines:
 		else: Args[key] = args
 		print key, '=', args
 start_time = timeit.default_timer()
+
+Args['inter'] == lf.boolean(Args['inter'])
 
 if len(Args['agg_frame']) == 0:
 	print 'Using default values of agg_frame: 150000 bp'
@@ -79,7 +81,7 @@ fname = [Args['out_path']+Args['contact_files'][i] for i in range(2)]
 for i in range(2):
 	out_name = '%s.%s.liftContacts' % (fname[i],Args['model'])
 	print '\tstart contact comparing...', out_name
-	Dif_Contact = lf.iDifferContact(contactList[i], contactList[1-i], MarkPoints[i], Args['resolution'], Args['model'], Args['duplicate_filter'], l2i[i-1],fname[i])
+	Dif_Contact = lf.iDifferContact(contactList[i], contactList[1-i], MarkPoints[i], Args['resolution'], Args['inter'], Args['model'], Args['dups_filter'], l2i[i-1],fname[i])
 	elp = timeit.default_timer() - start_time
 	print '\tend contact comparing', elp
 	

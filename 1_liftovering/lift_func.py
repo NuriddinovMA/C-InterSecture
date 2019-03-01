@@ -17,6 +17,11 @@ def HashTry(Hash, key):
 		t = 0
 	return t
 
+def boolean(x):
+	if x == 'False' or x == 'false' or x == 'f' or x == 'F': return False
+	elif x == 'True' or x == 'true' or x == 't' or x == 'T': return True
+	else: return x
+
 def ChromIndexing(path):
 	ChrInd = {}
 	f = open(path,'r')
@@ -350,7 +355,7 @@ def iDifferContactStat(Contact_disp_0, Contact_disp_1, ObjCoorMP, model):
 		Stat[2][i] = Stat[1][i] - Stat[2][i]
 	return Stat
 
-def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model, criteria, ChrIdxs2,stat_out):
+def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter, model, criteria, ChrIdxs2,stat_out):
 	DifferContact = {}
 	Statistic = ['all','remappable','remapped','processed','duplicated'],[0,0,0,0,0],[[],[],[],[],[]]
 	for i in Contact_disp_0:
