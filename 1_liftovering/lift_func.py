@@ -363,7 +363,8 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 		key2 = i[2:]
 		Statistic[1][0] += 1
 		Statistic[2][0] += [key1,key2,]
-		if (HashTry(ObjCoorMP, key1) == 1) and (HashTry(ObjCoorMP, key2) == 1):
+		if (key1[0] != key2[0]) and inter == False: pass
+		elif (HashTry(ObjCoorMP, key1) == 1) and (HashTry(ObjCoorMP, key2) == 1):
 			end1 = len(ObjCoorMP[key1])
 			end2 = len(ObjCoorMP[key2])
 			k = 0
@@ -380,7 +381,8 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 					c = [0,0,0,0,0,0,0,set(),set()]
 					for k1 in ObjCoorMP[key1][j1]:
 						for k2 in ObjCoorMP[key2][j2]:
-							if HashTry(Contact_disp_1,k1+k2) == 1:
+							if (k1[0] != k2[0]) and inter == False: pass
+							elif HashTry(Contact_disp_1,k1+k2) == 1:
 								dc = iDuplicateContact(Contact_disp_1[k1+k2], ObjCoorMP[key1][j1][k1], ObjCoorMP[key2][j2][k2])
 								c[0] += dc[0]
 								c[1] += dc[1]
