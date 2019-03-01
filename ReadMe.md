@@ -51,7 +51,7 @@ python lift.py < lift.ini
 ```
 Ini-file contains all needed parameters ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/1_liftovering/EXAMPLE-LIFT.ini)). The pipeline produces **two** `.liftContacts`-files with liftovered contacts: species_1 to species_2 and species_2 to species_1. The liftovered contacts are stored using a simple tab-delimited text format:
 ```
-chr1_reference \ pos1_reference \ chr2_reference \ pos2_reference \ remap1_query \ remap2_query \ reference_contacts \ query_contacts \ reference_deviations \ query_deviations	\ reference_coverages \ query_coverages	\ query_contact_distances
+chr1_observed \ pos1_observed \ chr2_observed \ pos2_observed \ remap1_control \ remap2_control \ observed_contacts \ control_contacts \ observed_deviations \ control_deviations \ observed_coverages_pos1 \ observed_coverages_pos2 \ control_coverages_pos1 \ control_contact_distances
 ```
 **WARNING!** To avoid rewriting files, create an independent folder for each pair of species in comparison.
 
