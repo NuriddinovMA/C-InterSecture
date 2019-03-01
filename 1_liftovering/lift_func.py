@@ -217,10 +217,10 @@ def pre2mark(preMark,name):
 	f1.close()
 	del markPoints
 
-def iReadingMarkPoints(path, resolution, ChrIdxs1,ChrIdxs2):  #Creating Mark Point List to convert MarkPoint from species to species 
+def iReadingMarkPoints(path, resolution, ChrIdxs1,ChrIdxs2,agg):  #Creating Mark Point List to convert MarkPoint from species to species 
 	ObjCoorMP = {},{},{}
 	key = ''
-	frame = 120000/resolution
+	frame = agg/resolution
 	f = open(path+'.mark', 'r')
 	lines = f.readlines()
 	f.close()
@@ -262,23 +262,38 @@ def iReadingMarkPoints(path, resolution, ChrIdxs1,ChrIdxs2):  #Creating Mark Poi
 						break
 					else: pass
 				if p == 0: ObjCoorMP[0][key].append({i:[1,k]})
+	N = [0,0,0]
 	for key in ObjCoorMP[0]:
 		S = 0.0
 		for n in ObjCoorMP[0][key]: 
 			for k in n: S += n[k][0]
-		for n in ObjCoorMP[0][key]:
-			for k in n: n[k] = [ round( n[k][0]/S, 2), round( n[k][1], 2) ]
+		for n in range(len(ObjCoorMP[0][key])-1,-1,-1):
+			keys = ObjCoorMP[0][key][n].keys()
+			for k in keys:
+				ObjCoorMP[0][key][n][k] = ( round( ObjCoorMP[0][key][n][k][0]/S, 2), round( ObjCoorMP[0][key][n][k][1], 2) )
+				if (ObjCoorMP[0][key][n][k][0] == 0.0) or (ObjCoorMP[0][key][n][k][1] == 0.0):
+					N[0] += 1
+					del ObjCoorMP[0][key][n][k]
+			if len(ObjCoorMP[0][key][n]) == 0:
+				N[1] += 1
+				del ObjCoorMP[0][key][n]
+		if len(ObjCoorMP[0][key]) == 0:
+			N[2] += 1
+			del ObjCoorMP[0][key]
+	print '\t\tdropped remapped bins', N
 	sorted(ObjCoorMP[0])
 	#return ObjCoorMP
 	return ObjCoorMP[0]
 
 def iDuplicateContact(Contact_disp_L, ObjCoorMP1, ObjCoorMP2):
-	c = [0,0,0,0,0]
-	c[4] = ObjCoorMP1[0]*ObjCoorMP2[0]*ObjCoorMP1[1]*ObjCoorMP2[1]
-	c[0] = c[4]*Contact_disp_L[0]
-	c[1] = c[4]*Contact_disp_L[1]
-	c[2] = c[4]*Contact_disp_L[2]
-	c[3] = c[4]*Contact_disp_L[-1]
+	c = [0,0,0,0,0,0,0]
+	c[-1] = ObjCoorMP1[0]*ObjCoorMP2[0]*ObjCoorMP1[1]*ObjCoorMP2[1]
+	c[0] = c[-1]*Contact_disp_L[0]
+	c[1] = c[-1]*Contact_disp_L[1]
+	c[2] = c[-1]*Contact_disp_L[2]
+	c[3] = c[-1]*Contact_disp_L[3]
+	c[4] = c[-1]*Contact_disp_L[4]
+	c[-2] = c[-1]*Contact_disp_L[-1]
 	return c
 	
 def iLabel(KeyList, resolution, ChrIdxs2):
@@ -294,6 +309,20 @@ def iLabel(KeyList, resolution, ChrIdxs2):
 		lb = '%s:%i-' % (ChrIdxs2[KeyList[0][0]],KeyList[0][1]*resolution)
 	if lb == '': lb = '-------'
 	return lb
+
+def iChouseBest(writed, dupled, crit):
+	result = True
+	if crit == 'coverage':
+		if writed[-2]*writed[-3] < dupled[-2]*dupled[-3] : results = True
+		else: results = False
+	elif crit == 'deviation':
+		if writed[5] < dupled[5] : results = True
+		else: results = False
+	else:
+		if (writed[-1] < dupled[-1]) or (dupled[-1] < 0): results = True
+		else: results = False
+	
+	return result
 
 def iDifferContactStat(Contact_disp_0, Contact_disp_1, ObjCoorMP, model):
 	DifferContact = {},{}
@@ -320,7 +349,7 @@ def iDifferContactStat(Contact_disp_0, Contact_disp_1, ObjCoorMP, model):
 		Stat[2][i] = Stat[1][i] - Stat[2][i]
 	return Stat
 
-def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model, ChrIdxs2,stat_out):
+def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model, criteria, ChrIdxs2,stat_out):
 	DifferContact = {}
 	Statistic = ['all','remappable','remapped','processed','duplicated'],[0,0,0,0,0],[[],[],[],[],[]]
 	for i in Contact_disp_0:
@@ -332,7 +361,7 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 			end1 = len(ObjCoorMP[key1])
 			end2 = len(ObjCoorMP[key2])
 			k = 0
-			c = [0,0,0,0,0,set(),set()]
+			c = [0,0,0,0,0,0,0,set(),set()]
 			Statistic[1][1] += 1
 			if end1 == 0: print "remapping error!!!", ObjCoorMP[key1]
 			elif end1 == 1: Statistic[2][1] += [key1,]
@@ -342,7 +371,7 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 			else: Statistic[2][4] += [key2,]
 			for j1 in range(end1):
 				for j2 in range(end2):
-					c = [0,0,0,0,0,set(),set()]
+					c = [0,0,0,0,0,0,0,set(),set()]
 					for k1 in ObjCoorMP[key1][j1]:
 						for k2 in ObjCoorMP[key2][j2]:
 							if HashTry(Contact_disp_1,k1+k2) == 1:
@@ -352,8 +381,10 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 								c[2] += dc[2]
 								c[3] += dc[3]
 								c[4] += dc[4]
-								c[5].add(k1)
-								c[6].add(k2)
+								c[-4] += dc[-4]
+								c[-3] += dc[-3]
+								c[-2].add(k1)
+								c[-1].add(k2)
 								k += 1
 							elif HashTry(Contact_disp_1,k2+k1) == 1:
 								dc = iDuplicateContact(Contact_disp_1[k2+k1], ObjCoorMP[key1][j1][k1], ObjCoorMP[key2][j2][k2])
@@ -362,8 +393,10 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 								c[2] += dc[2]
 								c[3] += dc[3]
 								c[4] += dc[4]
-								c[5].add(k2)
-								c[6].add(k1)
+								c[-4] += dc[-4]
+								c[-3] += dc[-3]
+								c[-2].add(k2)
+								c[-1].add(k1)
 								k += 1
 							else: pass
 					if k == 0: pass
@@ -371,17 +404,19 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 						Statistic[1][2] += 1
 						Statistic[2][2] += [key1,key2,]
 						if model != 'balanced': norm = 1
-						else: norm = c[4]
-						if c[4] != 0:
+						else: norm = c[-3]
+						if c[-3] != 0:
 							Statistic[1][3] += 1
 							Statistic[2][3] += [key1,key2,]
 							cc = (
 								int(round((c[0])/norm)), 
 								int(round((c[1])/norm)), 
 								int(round((c[2])/norm)),
-								float(round((c[3])/norm,2)),
-								set(c[5]),
-								set(c[6])
+								int(round((c[3])/norm)),
+								int(round((c[4])/norm)),
+								float(round((c[-4])/norm,2)),
+								set(c[-2]),
+								set(c[-1])
 							)
 							disp1 = max(( Contact_disp_0[i][2]-Contact_disp_0[i][0]),(Contact_disp_0[i][0]-Contact_disp_0[i][1])) 
 							disp2 = max((cc[2]-cc[0]),(cc[0]-cc[1]))
@@ -389,12 +424,14 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 							#if (disp1+disp2) < 0: print '\t\tError', i, k1, k2
 							#dfr = math.fabs(Contact_disp_0[i][0] - cc[0])
 							#conf = round(1.0*dfr/disp, 2)
-							if HashTry(DifferContact,i) == 0: DifferContact[i] = (iLabel(cc[4],resolution,ChrIdxs2)[:-1], iLabel(cc[5],resolution,ChrIdxs2)[:-1], Contact_disp_0[i][0], cc[0], disp1, disp2, Contact_disp_0[i][3], Contact_disp_0[i][4], cc[3])
+							to_wrire = (iLabel(cc[-2],resolution,ChrIdxs2)[:-1], iLabel(cc[-1],resolution,ChrIdxs2)[:-1], Contact_disp_0[i][0], cc[0], disp1, disp2, Contact_disp_0[i][3], Contact_disp_0[i][4], cc[3], cc[4], cc[-3])
+							if HashTry(DifferContact,i) == 0: DifferContact[i] = to_write
 							else:
 								Statistic[1][4] += 1
 								#Statistic[2][4] += [key1,key2,] 
-								if DifferContact[i][-1] < cc[3] or cc[3] <= 0 : pass
-								else: DifferContact[i] = ( iLabel(cc[4],resolution,ChrIdxs2)[:-1], iLabel(cc[5],resolution,ChrIdxs2)[:-1], Contact_disp_0[i][0], cc[0], disp1, disp2, Contact_disp_0[i][3], Contact_disp_0[i][4], cc[3] )
+								#if DifferContact[i][-1] < cc[-3] or cc[-3] <= 0 : pass
+								if iChouseBest(DifferContact[i],to_write,criteria) == True: pass
+								else: DifferContact[i] = to_write
 						else: pass
 		else: pass
 	f = open(stat_out+'.stat','w')
@@ -407,7 +444,7 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, model,
 def iPrintDifferContact(data, resolution, ChrIdxs, out):
 	f = open(out, 'w')
 	Keys = sorted(data.keys(),key=lambda x: (x[0],x[2],x[1],x[3]))
-	print >> f, 'chr1_reference\tpos1_reference\tchr2_reference\tpos2_reference\tremap1_query\tremap2_query\treference_contacts\tquery_contacts\treference_deviations\tquery_deviations\treference_coverages\tquery_coverages\tquery_contact_distances'
+	print >> f, 'chr1_observed\tpos1_observed\tchr2_observed\tpos2_observed\tremap1_control\tremap2_control\tobserved_contacts\tcontrol_contacts\tobserved_deviations\tcontrol_deviations\tobserved_coverages_pos1\tobserved_coverages_pos2\tcontrol_coverages_pos1\tcontrol_coverages_pos2\tcontrol_contact_distances'
 	for key in Keys:
 		i = data[key]
 		#for i in data[key]:

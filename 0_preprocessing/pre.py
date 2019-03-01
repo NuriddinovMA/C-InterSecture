@@ -1,3 +1,4 @@
+import os
 import sys
 import timeit
 import pre_func as prf
@@ -24,6 +25,8 @@ Args['inter'] == prf.boolean(Args['inter'])
 
 suffix = '/%s.%s.%ikb.%iN.%iC.%iMb' % (Args['sample_name'],Args['statistic'],Args['resolution']/1000,Args['unmapped_bases'],Args['coverage'],Args['max_distance'])
 
+try: os.makedirs(Args['out_path'])
+except OSError: pass
 out_name = Args['out_path'] + suffix
 #
 #This block indexes chromosomes and analyses bins by a unmapped_bases
@@ -48,13 +51,13 @@ print '...end data preparing %.2f sec' % elp
 #
 print '\nStep 1: Raw matrix reading...'
 print '\tDropped bins', len(ubh)
-rawContactHash = prf.iSparseMatrixReader(Args['raw_contacts'], binIdxs, ubh, coverage=Args['coverage'],raw=True)
+rawContactHash = prf.iSparseMatrixReader(Args['raw_contacts'], binIdxs, ubh, coverage=Args['coverage'], raw=True, inter=Args['inter'])
 print '\tDropped bins', len(ubh)
 elp = timeit.default_timer() - start_time
 print '\t%i contact analyzing for %.2f sec; memory sized: %.2f Mb' % (len(rawContactHash[1]), elp, 1.0*sys.getsizeof(rawContactHash)/1024/1024)
 
 print '\nStep 2: Analyzing normalized marix for resolution %ikb... ' % (Args['resolution']/1000)
-normContactHash = prf.iSparseMatrixReader(Args['norm_contacts'], binIdxs, ubh, raw=False,inter=Args['inter'])
+normContactHash = prf.iSparseMatrixReader(Args['norm_contacts'], binIdxs, ubh, raw=False, inter=Args['inter'])
 elp = timeit.default_timer() - start_time
 print '\t%i normalized matrix reading tume: %.2f sec; memory sized: %.2f Mb' % (len(normContactHash),elp, sys.getsizeof(normContactHash )/1024.0/1024.0 )
 #H1 = set( normContactHash.keys() )
@@ -84,6 +87,7 @@ print '... contact transforming end time %.2f sec; memory sized: %.2f Mb' % ( el
 #
 #Writing contacts 
 #
+
 print '\nStep 5: Database writing...'
 prf.iBinContactWriter(out_name, totalContactList, l2i)
 del totalContactList
