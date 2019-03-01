@@ -430,7 +430,7 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 							#if (disp1+disp2) < 0: print '\t\tError', i, k1, k2
 							#dfr = math.fabs(Contact_disp_0[i][0] - cc[0])
 							#conf = round(1.0*dfr/disp, 2)
-							to_wrire = (iLabel(cc[-2],resolution,ChrIdxs2)[:-1], iLabel(cc[-1],resolution,ChrIdxs2)[:-1], Contact_disp_0[i][0], cc[0], disp1, disp2, Contact_disp_0[i][3], Contact_disp_0[i][4], cc[3], cc[4], cc[-3])
+							to_write = (iLabel(cc[-2],resolution,ChrIdxs2)[:-1], iLabel(cc[-1],resolution,ChrIdxs2)[:-1], Contact_disp_0[i][0], cc[0], disp1, disp2, Contact_disp_0[i][3], Contact_disp_0[i][4], cc[3], cc[4], cc[-3])
 							if HashTry(DifferContact,i) == 0: DifferContact[i] = to_write
 							else:
 								Statistic[1][4] += 1
