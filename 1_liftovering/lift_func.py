@@ -263,13 +263,14 @@ def iReadingMarkPoints(path, resolution, ChrIdxs1,ChrIdxs2,agg):  #Creating Mark
 					else: pass
 				if p == 0: ObjCoorMP[0][key].append({i:[1,k]})
 	N = [0,0,0]
-	for key in ObjCoorMP[0]:
+	headKeys = ObjCoorMP[0].keys()
+	for key in headKeys:
 		S = 0.0
 		for n in ObjCoorMP[0][key]: 
 			for k in n: S += n[k][0]
 		for n in range(len(ObjCoorMP[0][key])-1,-1,-1):
-			keys = ObjCoorMP[0][key][n].keys()
-			for k in keys:
+			lowKeys = ObjCoorMP[0][key][n].keys()
+			for k in lowKeys:
 				ObjCoorMP[0][key][n][k] = ( round( ObjCoorMP[0][key][n][k][0]/S, 2), round( ObjCoorMP[0][key][n][k][1], 2) )
 				if (ObjCoorMP[0][key][n][k][0] == 0.0) or (ObjCoorMP[0][key][n][k][1] == 0.0):
 					N[0] += 1
