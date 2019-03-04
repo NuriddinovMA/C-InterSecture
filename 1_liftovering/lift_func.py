@@ -391,8 +391,8 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 								c[2] += dc[2]
 								c[3] += dc[3]
 								c[4] += dc[4]
-								c[-4] += dc[-4]
-								c[-3] += dc[-3]
+								c[-4] += dc[-2]
+								c[-3] += dc[-1]
 								c[-2].add(k1)
 								c[-1].add(k2)
 								k += 1
@@ -403,8 +403,8 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 								c[2] += dc[2]
 								c[3] += dc[3]
 								c[4] += dc[4]
-								c[-4] += dc[-4]
-								c[-3] += dc[-3]
+								c[-4] += dc[-2]
+								c[-3] += dc[-1]
 								c[-2].add(k2)
 								c[-1].add(k1)
 								k += 1
