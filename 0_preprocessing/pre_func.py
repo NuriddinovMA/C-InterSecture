@@ -68,7 +68,7 @@ def iSparseMatrixReader(path, binIdxs, unBinHash, **kwargs):
 		contactHash = _iContactFiltring(contactHash,unBinHash,coverage)
 	else: 
 		contactHash = _iNormedSparceMatrixReader(path,binIdxs,float,inter)
-		contactHash = _iMatrixNorming(contactHash,unBinHash)
+		contactHash = _iMatrixNorming(contactHash,unBinHash,inter)
 	return contactHash
 
 def _iRawSparceMatrixReader(path,binIdxs,unBinHash,format,_inter):
@@ -173,7 +173,7 @@ def _iContactFiltring(contactHash, unBinHash, coverage):
 	print '\t\t contact analyzing full time: %.2f memory sized: %.2fMb' % (elp, 1.0*sys.getsizeof(contactHash[0])/1024/1024 )
 	return contactHash
 
-def _iMatrixNorming(contactHash, unBinHash):
+def _iMatrixNorming(contactHash, unBinHash, _inter):
 	start_time = timeit.default_timer()
 	print '\t\t contact distribution calculation'
 	l = 0
@@ -183,6 +183,7 @@ def _iMatrixNorming(contactHash, unBinHash):
 			if key[0] == key[2]: l = abs(key[3] - key[1])
 			else: l = -1000
 			if l == 1 or l == 0: del contactHash[0][key]
+			elif l == -1000 and _inter == False: del contactHash[0][key]
 			else: contactHash[0][key] = int(contactHash[0][key]/contactHash[1][key[:2]]*1e6),l
 		else: del contactHash[0][key]
 	del contactHash[1]

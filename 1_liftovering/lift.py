@@ -23,7 +23,7 @@ for line in lines:
 			except ValueError: Args[key] = args[0]
 			except KeyError: pass
 		else: Args[key] = args
-		print key, '=', args
+		#print key, '=', args
 start_time = timeit.default_timer()
 
 Args['inter'] == lf.boolean(Args['inter'])
@@ -43,6 +43,8 @@ if Args['dups_filter'] == 'length' or Args['dups_filter'] == 'coverage' or Args[
 else: 
 	print 'Invalid duplicate_filter value!'
 	exit()
+
+for key in Args: print key, ' = ', Args[key]
 
 try: os.makedirs(Args['out_path'])
 except OSError: pass

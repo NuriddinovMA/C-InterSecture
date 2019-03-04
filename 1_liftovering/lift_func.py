@@ -357,7 +357,7 @@ def iDifferContactStat(Contact_disp_0, Contact_disp_1, ObjCoorMP, model):
 
 def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter, model, criteria, ChrIdxs2,stat_out):
 	DifferContact = {}
-	Statistic = ['all','remappable','processed','uniq','duplicated','dropped'],[0,0,0,set([]),[],0],[set([]),set([]),set([]),set([]),set([]),set([])]
+	Statistic = ['all','remappable','processed','unique','duplicated','dropped'],[0,0,0,set([]),[],0],[set([]),set([]),set([]),set([]),set([]),set([])]
 	for i in Contact_disp_0:
 		key1 = i[:2]
 		key2 = i[2:]
@@ -383,7 +383,7 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 					k = 0
 					for k1 in ObjCoorMP[key1][j1]:
 						for k2 in ObjCoorMP[key2][j2]:
-							if (k1[0] != k2[0]) and inter == False: pass
+							if (k1[0] != k2[0]) and (inter == False): pass
 							elif HashTry(Contact_disp_1,k1+k2) == 1:
 								dc = iDuplicateContact(Contact_disp_1[k1+k2], ObjCoorMP[key1][j1][k1], ObjCoorMP[key2][j2][k2])
 								c[0] += dc[0]
