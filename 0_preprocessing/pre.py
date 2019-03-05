@@ -21,7 +21,9 @@ for line in lines:
 		try: Args[key] = int(args)
 		except ValueError: Args[key] = args
 		except KeyError: pass
-Args['inter'] == prf.boolean(Args['inter'])
+Args['inter'] == False #prf.boolean(Args['inter'])
+
+for key in Args: print key, ' = ', Args[key]
 
 suffix = '/%s.%s.%ikb.%iN.%iC.%iMb' % (Args['sample_name'],Args['statistic'],Args['resolution']/1000,Args['unmapped_bases'],Args['coverage'],Args['max_distance'])
 
@@ -51,13 +53,13 @@ print '...end data preparing %.2f sec' % elp
 #
 print '\nStep 1: Raw matrix reading...'
 print '\tDropped bins', len(ubh)
-rawContactHash = prf.iSparseMatrixReader(Args['raw_contacts'], binIdxs, ubh, coverage=Args['coverage'], raw=True, inter=Args['inter'])
+rawContactHash = prf.iSparseMatrixReader(Args['raw_contacts'], binIdxs, ubh, coverage=Args['coverage'], raw=True)
 print '\tDropped bins', len(ubh)
 elp = timeit.default_timer() - start_time
 print '\t%i contact analyzing for %.2f sec; memory sized: %.2f Mb' % (len(rawContactHash[1]), elp, 1.0*sys.getsizeof(rawContactHash)/1024/1024)
 
 print '\nStep 2: Analyzing normalized marix for resolution %ikb... ' % (Args['resolution']/1000)
-normContactHash = prf.iSparseMatrixReader(Args['norm_contacts'], binIdxs, ubh, raw=False, inter=Args['inter'])
+normContactHash = prf.iSparseMatrixReader(Args['norm_contacts'], binIdxs, ubh, raw=False)
 elp = timeit.default_timer() - start_time
 print '\t%i normalized matrix reading tume: %.2f sec; memory sized: %.2f Mb' % (len(normContactHash),elp, sys.getsizeof(normContactHash )/1024.0/1024.0 )
 #H1 = set( normContactHash.keys() )
@@ -72,7 +74,7 @@ del rawContactHash
 del normContactHash
 elp = timeit.default_timer() - start_time
 print '\t...genome bin statistic calculating end time  %.2f sec; sec memory sized: %.2f Mb' % ( elp, sys.getsizeof(npContactBins)/1024.0/1024.0 )
-contactDistanceHash = prf.iDistanceHash(npContactBins,Args['max_distance']*1e6/Args['resolution'])
+contactDistanceHash = prf.iDistanceHash(npContactBins,Args['max_distance']*1e6/Args['resolution'], Args['inter'])
 del npContactBins
 elp = timeit.default_timer() - start_time
 print '...Analyzing end time %.2f sec; memory sized: %.2f Mb' % ( elp, sys.getsizeof(contactDistanceHash)/1024.0/1024.0 ) 

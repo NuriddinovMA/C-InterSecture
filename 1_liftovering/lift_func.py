@@ -357,7 +357,7 @@ def iDifferContactStat(Contact_disp_0, Contact_disp_1, ObjCoorMP, model):
 
 def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter, model, criteria, ChrIdxs2,stat_out):
 	DifferContact = {}
-	Statistic = ['all','remappable','processed','unique','duplicated','dropped'],[0,0,0,set([]),[],0],[set([]),set([]),set([]),set([]),set([]),set([])]
+	Statistic = ['all','remappable','processed','unique','duplicated','dropped'],[0,0,set([]),set([]),[],0],[set([]),set([]),set([]),set([]),set([]),set([])]
 	for i in Contact_disp_0:
 		key1 = i[:2]
 		key2 = i[2:]
@@ -411,7 +411,8 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 							else: Statistic[2][5] |= set([key1,key2,])
 					if k == 0: pass
 					else:
-						Statistic[1][2] += 1
+						#Statistic[1][2] += 1
+						Statistic[1][2] |= set([i,])
 						Statistic[2][2] |= set([key1,key2,])
 						if model != 'balanced': norm = 1
 						else: norm = c[-3]
@@ -440,13 +441,13 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 								else: DifferContact[i] = to_write
 						else: pass
 		else: pass
+	Statistic[1][2] = len(Statistic[1][2])
 	Statistic[1][5] = len(Statistic[1][4])
+	Statistic[1][4] = len( set(Statistic[1][4]) )
+	Statistic[1][3] = len( Statistic[1][3] ) - Statistic[1][4]
 	Statistic[2][5] = Statistic[2][5] - Statistic[2][2]
 	Statistic[2][3] = Statistic[2][3] - Statistic[2][5]
 	Statistic[2][4] = Statistic[2][4] - Statistic[2][5]
-	N = len( Statistic[1][3] & set(Statistic[1][4]) )
-	Statistic[1][3] = len(Statistic[1][3]) - N
-	Statistic[1][4] = Statistic[1][5] + N
 	f = open(stat_out+'.stat','w')
 	for i in range(6): 
 		Statistic[2][i] = len(Statistic[2][i])

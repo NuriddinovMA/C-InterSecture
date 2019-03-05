@@ -61,17 +61,15 @@ def iSparseMatrixReader(path, binIdxs, unBinHash, **kwargs):
 	except KeyError: raw = True
 	try: coverage = kwargs['coverage']
 	except KeyError: coverage = 1
-	try: inter = kwargs['inter']
-	except KeyError: inter = False
 	if raw == True: 
-		contactHash = _iRawSparceMatrixReader(path,binIdxs,unBinHash,int,inter)
+		contactHash = _iRawSparceMatrixReader(path,binIdxs,unBinHash,int)
 		contactHash = _iContactFiltring(contactHash,unBinHash,coverage)
 	else: 
-		contactHash = _iNormedSparceMatrixReader(path,binIdxs,float,inter)
-		contactHash = _iMatrixNorming(contactHash,unBinHash,inter)
+		contactHash = _iNormedSparceMatrixReader(path,binIdxs,float)
+		contactHash = _iMatrixNorming(contactHash,unBinHash)
 	return contactHash
 
-def _iRawSparceMatrixReader(path,binIdxs,unBinHash,format,_inter):
+def _iRawSparceMatrixReader(path,binIdxs,unBinHash,format):
 	start_time = timeit.default_timer()
 	contactHash = [{},{}]
 	f = open(path,'r')
@@ -87,22 +85,20 @@ def _iRawSparceMatrixReader(path,binIdxs,unBinHash,format,_inter):
 			s0 = binIdxs[int(parse[0])]
 			s1 = binIdxs[int(parse[1])]
 			c = format(parse[2])
-			if (s0[0] != s1[0]) and (_inter == False): pass
-			else:
-				if ( ( (s0[0] == s1[0]) and (abs(s1[1] - s0[1]) > 1) ) or (s0[0] != s1[0]) ):
-					if ( HashTry(unBinHash, s0) == 0 ) and ( HashTry(unBinHash, s1) == 0 ): 
-						if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
-							if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
-							else: contactHash[0][s0+s1] += c
-						else:
-							if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
-							else: contactHash[0][s1+s0] += c
-						if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
-						else: contactHash[1][s0] += c
-						if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
-						else: contactHash[1][s1] += c
-					else: pass
+			if ( ( (s0[0] == s1[0]) and (abs(s1[1] - s0[1]) > 1) ) or (s0[0] != s1[0]) ):
+				if ( HashTry(unBinHash, s0) == 0 ) and ( HashTry(unBinHash, s1) == 0 ): 
+					if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
+						if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
+						else: contactHash[0][s0+s1] += c
+					else:
+						if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
+						else: contactHash[0][s1+s0] += c
+					if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
+					else: contactHash[1][s0] += c
+					if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
+					else: contactHash[1][s1] += c
 				else: pass
+			else: pass
 			if (ln-i) % 10000000 == 0:
 				elp = timeit.default_timer() - start_time
 				print '\t\traw sparse matrix parsing progress: %i, time elapsed: %.2f, memory sized: %.2fMb' % (ln-i, elp, 1.0*sys.getsizeof(contactHash)/1024/1024 )
@@ -110,7 +106,7 @@ def _iRawSparceMatrixReader(path,binIdxs,unBinHash,format,_inter):
 		except TypeError: pass
 	return contactHash
 
-def _iNormedSparceMatrixReader(path,binIdxs,format,_inter):
+def _iNormedSparceMatrixReader(path,binIdxs,format):
 	start_time = timeit.default_timer()
 	contactHash = [{},{}]
 	f = open(path,'r')
@@ -126,18 +122,16 @@ def _iNormedSparceMatrixReader(path,binIdxs,format,_inter):
 			s0 = binIdxs[int(parse[0])]
 			s1 = binIdxs[int(parse[1])]
 			c = format(parse[2])
-			if (s0[0] != s1[0]) and (_inter == False): pass
+			if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
+				if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
+				else: contactHash[0][s0+s1] += c
 			else:
-				if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
-					if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
-					else: contactHash[0][s0+s1] += c
-				else:
-					if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
-					else: contactHash[0][s1+s0] += c
-				if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
-				else: contactHash[1][s0] += c
-				if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
-				else: contactHash[1][s1] += c
+				if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
+				else: contactHash[0][s1+s0] += c
+			if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
+			else: contactHash[1][s0] += c
+			if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
+			else: contactHash[1][s1] += c
 			if (ln-i) % 10000000 == 0:
 				elp = timeit.default_timer() - start_time
 				print '\t\tnormed sparse matrix parsing progress: %i, time elapsed: %.2f, memory sized: %.2fMb' % (ln-i, elp, 1.0*sys.getsizeof(contactHash)/1024/1024 )
@@ -173,7 +167,7 @@ def _iContactFiltring(contactHash, unBinHash, coverage):
 	print '\t\t contact analyzing full time: %.2f memory sized: %.2fMb' % (elp, 1.0*sys.getsizeof(contactHash[0])/1024/1024 )
 	return contactHash
 
-def _iMatrixNorming(contactHash, unBinHash, _inter):
+def _iMatrixNorming(contactHash, unBinHash):
 	start_time = timeit.default_timer()
 	print '\t\t contact distribution calculation'
 	l = 0
@@ -182,8 +176,7 @@ def _iMatrixNorming(contactHash, unBinHash, _inter):
 		if ( HashTry(unBinHash, key[:2]) == 0 ) and ( HashTry(unBinHash, key[2:]) == 0 ):
 			if key[0] == key[2]: l = abs(key[3] - key[1])
 			else: l = -1000
-			if l == 1 or l == 0: del contactHash[0][key]
-			elif l == -1000 and _inter == False: del contactHash[0][key]
+			if (l == 1) or (l == 0): del contactHash[0][key]
 			else: contactHash[0][key] = int(contactHash[0][key]/contactHash[1][key[:2]]*1e6),l
 		else: del contactHash[0][key]
 	del contactHash[1]
@@ -192,6 +185,7 @@ def _iMatrixNorming(contactHash, unBinHash, _inter):
 	return contactHash[0]
 
 def iContactBinStat(rawContactHash, normContactHash):
+	
 	contactBinList = []
 	for key in rawContactHash[0]:
 		try:
@@ -202,7 +196,7 @@ def iContactBinStat(rawContactHash, normContactHash):
 		except KeyError: pass
 	return np.array(contactBinList, dtype=np.float32)
 
-def iDistanceHash(npContactBins,dist_max):
+def iDistanceHash(npContactBins,dist_max,inter):
 	contactDistanceHash = {}
 	print '\tDeviation calculate for contactList between %i locus pair' % (len(npContactBins))
 	start_time = timeit.default_timer()
@@ -214,11 +208,14 @@ def iDistanceHash(npContactBins,dist_max):
 		npContactBins[:,8]
 		) ) )
 	Keys = np.unique(temp[:,-1])
-	contactDistanceHash = dict([(i,[]) for i in Keys])
-	for i in temp: contactDistanceHash[i[-1]].append(i)
+	Keys = sorted(Keys)
+	if inter == True: Keys = Keys[1:] + [Keys[0],]
+	else: Keys = Keys[1:]
+	contactDistanceHash = {i:[] for i in Keys}
+	for i in temp: 
+		try: contactDistanceHash[i[-1]].append(i)
+		except KeyError: pass
 	del temp
-	Keys = sorted(contactDistanceHash.keys())
-	Keys = Keys[1:] + [Keys[0],]
 	#print '\t\t', Keys
 	base_key = Keys[0]
 	base_count = len(contactDistanceHash[base_key])
