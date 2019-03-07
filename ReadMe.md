@@ -58,10 +58,10 @@ chr1_observed \ pos1_observed \ chr2_observed \ pos2_observed \ remap1_control \
 ### Postprocessing
 This step produces user-friendly output.
 
-`python allContacts2hic.py < post.ini` - generates .hic-files for JuiceBox for full genome comparing, this option requires Juicer Tools;
+`python liftContacts2hic.py < post.ini` - generates .hic-files for JuiceBox for full genome comparing, this option requires Juicer Tools;
 
-`python allContacts2plot.py < post.ini` - generates a heat-map representation of contacts within given region, reflecting differences between a chromatin architecture of comparing species and statistical significance of these differences;
+`python liftContacts2plot.py < post.ini` - generates a heat-map representation of contacts within given region, reflecting differences between a chromatin architecture of comparing species and statistical significance of these differences;
 
-`python allContacts2metric.py < post.ini` - calculate a quantitative estimation of differences between a chromatin architecture of comparing species and generate corresponded .bedGraph-files.
+`python liftContacts2metric.py < post.ini` - calculate a quantitative estimation of differences between a chromatin architecture of comparing species and generate corresponded .bedGraph-files.
 
 Ini-file contains all needed parameters to visualize results ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/2_postprocessing/EXAMPLE-POST.ini)).
