@@ -91,11 +91,11 @@ def readContacts(file, Order, resolution, **kwargs):
 			if (Order[parse[0]] < Order[parse[2]]): key = parse[0], c0, parse[2], c2
 			elif (Order[parse[0]] == Order[parse[2]]) and (c0 <= c2): key = parse[0], c0, parse[2], c2
 			else: key = parse[2], c2, parse[0], c0
-			c = float(parse[-7])
-			q = float(parse[-6])
-			dr = float(parse[-5])
-			dq = float(parse[-4])
-			l = float(parse[-1])
+			c = float(parse[6])
+			q = float(parse[7])
+			dr = float(parse[8])
+			dq =  float(parse[9])
+			l = float(parse[-2])
 			if HashTry(Contacts, key) == 0: Contacts[key] = [c,q,dr,dq,l]
 			else:
 				if l < Contacts[key][-1]: Contacts[key] = [c,q,dr,dq,l]
@@ -111,11 +111,11 @@ def readContacts(file, Order, resolution, **kwargs):
 			if (Order[parse[0]] < Order[parse[2]]): key = parse[0], c0, parse[2], c2
 			elif (Order[parse[0]] == Order[parse[2]]) and (c0 <= c2): key = parse[0], c0, parse[2], c2
 			else: key = parse[2], c2, parse[0], c0
-			c = float(parse[-7])
-			q = float(parse[-6])
-			dr = float(parse[-5])
-			dq =  float(parse[-4])
-			l = float(parse[-1])
+			c = float(parse[6])
+			q = float(parse[7])
+			dr = float(parse[8])
+			dq =  float(parse[9])
+			l = float(parse[-2])
 			if HashTry(Contacts, key) == 0: Contacts[key] = [c,q,dr,dq,l]
 			else:
 				if l < Contacts[key][-1]: Contacts[key] = [c,q,dr,dq,l]
@@ -131,9 +131,9 @@ def readContacts(file, Order, resolution, **kwargs):
 			c2 = int(parse[3])/resolution
 			if (Order[parse[0]] == Order[parse[2]]): lr = abs(c2-c0)
 			else: lr = -1000
-			c = float(parse[-7])
-			q = float(parse[-6])
-			lq = float(parse[-1])
+			c = float(parse[6])
+			q = float(parse[7])
+			lq = float(parse[-2])
 			Contacts.append((c,q,lr,lq))
 			if (ln-i) % 1000000 == 0:
 				elp = timeit.default_timer() - start_time
@@ -499,3 +499,32 @@ def intersectSynBlocks(synblockList, resolution):
 		if len(intersect[key]) == 0: del intersect[key]
 	del c
 	return intersect
+
+def liftConCom(liftContacts,type,**kwargs):
+	try: repeat = kwargs['repeat']
+	except KeyEror: repeat = False
+	lfC = np.copy(liftContacts)
+	if type == 'cc' or type == 'pp': f = cc
+	elif type == 'dd': f = dd
+	elif type == 'dc': f = dc
+	else: return
+	if repeat == False: x,y = f(lfC)
+	else:
+		x,y = [],[]
+		rndC = lfC
+		print len(rndC[0])
+		for i in range(repeat):
+			xy = []
+			if type == 'cc' or type == 'pp': np.random.shuffle(rndC[:,1])
+			elif type == 'dd': np.random.shuffle(rndC[:,3])
+			elif type == 'dc': np.random.shuffle(rndC[:,1])
+			else: pass
+			xy = f(rndC)
+			x += xy[0].tolist()
+			y += xy[1].tolist()
+		del rndC
+	return x,y
+	
+def cc(a): return a[:,0],a[:,1]
+def dd(a): return a[:,2],a[:,3]
+def dc(a): return 1.0*a[:,0]/a[:,1],1.0*a[:,2]/a[:,3]
