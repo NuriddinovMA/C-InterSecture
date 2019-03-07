@@ -324,8 +324,11 @@ def iChouseBest(writed, dupled, crit):
 	elif crit == 'deviation':
 		if writed[5] < dupled[5] : results = True
 		else: results = False
+	elif crit == 'length':
+		if (writed[-2] < dupled[-2]) or (dupled[-2] < 0): results = True
+		else: results = False
 	else:
-		if (writed[-1] < dupled[-1]) or (dupled[-1] < 0): results = True
+		if (writed[-1] < dupled[-1]): results = True
 		else: results = False
 	
 	return result
@@ -357,6 +360,7 @@ def iDifferContactStat(Contact_disp_0, Contact_disp_1, ObjCoorMP, model):
 
 def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter, model, criteria, ChrIdxs2,stat_out):
 	DifferContact = {}
+	Dups = {}
 	Statistic = ['all','remappable','processed','unique','duplicated','dropped'],[0,0,set([]),set([]),[],0],[set([]),set([]),set([]),set([]),set([]),set([])]
 	for i in Contact_disp_0:
 		key1 = i[:2]
@@ -424,12 +428,13 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 								int(round((c[3])/norm)),
 								int(round((c[4])/norm)),
 								float(round((c[-4])/norm,2)),
+								c[-3],
 								set(c[-2]),
 								set(c[-1])
 							)
 							disp1 = max(( Contact_disp_0[i][2]-Contact_disp_0[i][0]),(Contact_disp_0[i][0]-Contact_disp_0[i][1])) 
 							disp2 = max((cc[2]-cc[0]),(cc[0]-cc[1]))
-							to_write = (iLabel(cc[-2],resolution,ChrIdxs2)[:-1], iLabel(cc[-1],resolution,ChrIdxs2)[:-1], Contact_disp_0[i][0], cc[0], disp1, disp2, Contact_disp_0[i][3], Contact_disp_0[i][4], cc[3], cc[4], cc[-3])
+							to_write = (iLabel(cc[-2],resolution,ChrIdxs2)[:-1], iLabel(cc[-1],resolution,ChrIdxs2)[:-1], Contact_disp_0[i][0], cc[0], disp1, disp2, Contact_disp_0[i][3], Contact_disp_0[i][4], cc[3], cc[4], cc[-4],cc[-3])
 							if HashTry(DifferContact,i) == 0: 
 								DifferContact[i] = to_write
 								Statistic[1][3] |= set([i])
@@ -437,8 +442,13 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 								Statistic[1][4].append(i)
 								#Statistic[2][4] += [key1,key2,] 
 								#if DifferContact[i][-1] < cc[-3] or cc[-3] <= 0 : pass
-								if iChouseBest(DifferContact[i],to_write,criteria) == True: pass
-								else: DifferContact[i] = to_write
+								if iChouseBest(DifferContact[i],to_write,criteria) == True: 
+									if HashTry(Dups,i) == 0: Dups[i] = [to_write,]
+									else: Dups[i].append(to_write)
+								else:
+									if HashTry(Dups,i) == 0: Dups[i] = [DifferContact[i],]
+									else: Dups[i].append(DifferContact[i])
+									DifferContact[i] = to_write
 						else: pass
 		else: pass
 	Statistic[1][2] = len(Statistic[1][2])
@@ -453,18 +463,22 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 		Statistic[2][i] = len(Statistic[2][i])
 		print >> f, Statistic[0][i],Statistic[1][i],Statistic[2][i]
 	del Statistic
-	return DifferContact
+	return DifferContact,Dups
 
-def iPrintDifferContact(data, resolution, ChrIdxs, out):
+def iPrintDifferContact(data, resolution, ChrIdxs, out, dups):
+	if dups: out += '.dups'
 	f = open(out, 'w')
 	Keys = sorted(data.keys(),key=lambda x: (x[0],x[2],x[1],x[3]))
-	print >> f, 'chr1_observed\tpos1_observed\tchr2_observed\tpos2_observed\tremap1_control\tremap2_control\tobserved_contacts\tcontrol_contacts\tobserved_deviations\tcontrol_deviations\tobserved_coverages_pos1\tobserved_coverages_pos2\tcontrol_coverages_pos1\tcontrol_coverages_pos2\tcontrol_contact_distances'
-	for key in Keys:
-		i = data[key]
-		#for i in data[key]:
-		try:
-			Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%.2f\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8],i[9],i[10])
-		except:
-			Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8])
-		print >> f, Str,
+	print >> f, 'chr1_observed\tpos1_observed\tchr2_observed\tpos2_observed\tremap1_control\tremap2_control\tobserved_contacts\tcontrol_contacts\tobserved_deviations\tcontrol_deviations\tobserved_coverages_pos1\tobserved_coverages_pos2\tcontrol_coverages_pos1\tcontrol_coverages_pos2\tcontrol_contact_distances\tremapping_coverages'
+	if dups:
+		for key in Keys:
+			for i in data[key]:
+				Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%.2f\t%.5f\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11])
+				print >> f, Str,
+	else:
+		for key in Keys:
+			i = data[key]
+			#for i in data[key]:
+			Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%.2f\t%.5f\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11])
+			print >> f, Str,
 	f.close()

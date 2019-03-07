@@ -6,7 +6,7 @@ import lift_func as lf
 Args = {
 	'contact_path':'','contact_files':'','genome_path':'','chrom_orders':'',
 	'remap_path':'','remap_files':'','out_path':'',
-	'resolution':50000,'agg_frame':[150000],'model':'balanced','inter': False,'dups_filter': 'length'
+	'resolution':50000,'agg_frame':[150000],'model':'balanced','inter': False,'dups_filter': 'default'
 }
 
 lines = sys.stdin.readlines()
@@ -88,8 +88,10 @@ for i in range(2):
 	print '\tend contact comparing', elp
 	
 	print '\tDiffer contact writing'
-	lf.iPrintDifferContact(Dif_Contact, Args['resolution'], l2i[i], out_name)
+	lf.iPrintDifferContact(Dif_Contact[0], Args['resolution'], l2i[i], out_name, False)
 	print '\t\tdistant contact writing'
+	lf.iPrintDifferContact(Dif_Contact[1], Args['resolution'], l2i[i], out_name, True)
+	print '\t\tdropped dups contact writing'
 	del Dif_Contact
 	elp = timeit.default_timer() - start_time
 	print '\tend contact writing', elp
