@@ -86,7 +86,7 @@ for sm in range(len(Args['samples'])):
 	for file in files:
 		s = file.split('.')
 		fname = '%s/%s/%s' % (Args['contact_path'],Args['samples'][sm],file)
-		if Args['chrom_sizes'].has_key(s[0]) == True and s[1] == 'prc' and s[-1] == 'allContacts':
+		if Args['chrom_sizes'].has_key(s[0]) == True and s[1] == 'prc' and s[-1] == 'liftContacts':
 			elp = timeit.default_timer() - start_time
 			print '\tstart contact analizying %s, %s, %.2f' % (Args['samples'][sm], file, elp)
 			resolution = int(s[2][:-2])*1000
