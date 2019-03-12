@@ -187,7 +187,7 @@ def drawMap(allCon,locus,resolution,Scale1,Scale2,conf):
 		Map[1].append( key[3] - locus[1]/resolution )
 		size = (.1*(100 - allCon[key][2]))**2
 		size *= Scale1
-		color = 100 - allCon[key][0]
+		color = allCon[key][0]
 		if size > 100: size = 100
 		if size < 4: size = 4
 		Map[2].append( int(size) )
@@ -515,10 +515,8 @@ def liftConCom(liftContacts,type,**kwargs):
 		print len(rndC[0])
 		for i in range(repeat):
 			xy = []
-			if type == 'cc' or type == 'pp': np.random.shuffle(rndC[:,1])
-			elif type == 'dd': np.random.shuffle(rndC[:,3])
-			elif type == 'dc': np.random.shuffle(rndC[:,1])
-			else: pass
+			if type == 'cc' or type == 'pp' or type == 'dc': np.random.shuffle(rndC[:,1])
+			if type == 'dd' or type == 'dc': np.random.shuffle(rndC[:,3])
 			xy = f(rndC)
 			x += xy[0].tolist()
 			y += xy[1].tolist()
@@ -527,4 +525,4 @@ def liftConCom(liftContacts,type,**kwargs):
 	
 def cc(a): return a[:,0],a[:,1]
 def dd(a): return a[:,2],a[:,3]
-def dc(a): return 1.0*a[:,0]/a[:,1],1.0*a[:,2]/a[:,3]
+def dc(a): return np.log2(1.0*a[:,0]/a[:,1]),np.log2(1.0*a[:,2]/a[:,3])

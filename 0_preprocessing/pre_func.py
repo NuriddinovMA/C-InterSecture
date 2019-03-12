@@ -237,7 +237,7 @@ def iPercentileStatistics(contactDistanceHash):
 	start_time = timeit.default_timer()
 	p = range(1,101)
 	temp = [i[5] for i in contactDistanceHash]
-	try: prcList = np.percentile(temp, p, interpolation='nearest')
+	try: prcList = np.percentile(temp, p, interpolation='linear')
 	except TypeError:
 		#print '\t\tnumpy < 1.9.0',
 		prcList = np.percentile(temp, p)
@@ -255,7 +255,7 @@ def iPercentileStatistics(contactDistanceHash):
 def iPRC(c,prcList):
 	prc = [0,0,0]
 	try:
-		prc[0] = int( sc.percentileofscore(prcList,c[0],kind='rank') )
+		prc[0] = int( np.rint(sc.percentileofscore(prcList,c[0],kind='rank') ) )
 		prc[1] = int( sc.percentileofscore(prcList,c[0]*(1-c[1]),kind='strict') )
 		prc[2] = int( sc.percentileofscore(prcList,c[0]*(1+c[1]),kind='weak') )
 	except NameError:
