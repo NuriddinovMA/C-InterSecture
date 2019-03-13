@@ -73,10 +73,12 @@ else: Args['loci'] = []
 for key in Args.keys(): print '\t%s =' % key, Args[key]
 
 elp = timeit.default_timer() - start_time
-c = 0
+c = 125
 if Args['metric'] == 'pearsone' or  Args['metric'] == 'spearman': tail = 'equ'
 else: tail = 'prc'
-print 'Step 2: Analyzing'
+
+elp = timeit.default_timer() - start_time
+print 'Step 2: Analyzing', elp
 for sm in range(len(Args['samples'])):
 	if Args['contact_files'][sm][0] == 'all' or Args['contact_files'][sm][0][:3] == 'key': files = os.listdir( '%s/%s/' % (Args['contact_path'],Args['samples'][sm]))
 	else: files = [ a for a in Args['contact_files'][sm] ]
@@ -111,7 +113,7 @@ for sm in range(len(Args['samples'])):
 				elp = timeit.default_timer() - start_time
 				print '\t\tmetric for %i bin frame calculation: %.2f sec' % ( frame, elp)
 				if Args['statistics'] != 'only':
-					out = '%s/%s_%s.%s.%iframe.metric.bedGraph' % (Args['out_path'],Args['out_names'][sm],file[:-12],Args['metric'],frame)
+					out = '%s/%s_%s.%s.%iframe.metric.bedGraph' % (Args['out_path'],Args['out_names'][sm],file[:-13],Args['metric'],frame)
 					f = open(out,'w')
 					for m in M: 
 						L.append(m[3])

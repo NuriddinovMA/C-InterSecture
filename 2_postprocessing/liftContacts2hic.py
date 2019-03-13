@@ -8,7 +8,7 @@ print 'Step 1: Sites Reading...'
 start_time = timeit.default_timer()
 
 Args = {
-	'contact_path':'','samples':[],'contact_files':[],
+	'contact_path':'','samples':[],'contact_files':[], 'use_pre':False,
 	'frame':[], 'use_loci':False, 'loci': [], 'statistics': False,
 	'chrom_path':'','chrom_sizes':{}, 
 	'use_synblocks':False, 'synblocks_path':'', 'synblocks_files':[],
@@ -79,6 +79,8 @@ RH = {
 	40000: "1000000,200000,80000,40000",
 	50000: "1000000,200000,100000,50000"
 }
+elp = timeit.default_timer() - start_time
+print 'Step 2: Analyzing', elp
 for sm in range(len(Args['samples'])):
 	if Args['contact_files'][sm][0] == 'all' or Args['contact_files'][sm][0][:3] == 'key': files = os.listdir( '%s/%s/' % (Args['contact_path'],Args['samples'][sm]))
 	else: files = [ a for a in Args['contact_files'][sm] ]
@@ -88,7 +90,7 @@ for sm in range(len(Args['samples'])):
 	for file in files:
 		s = file.split('.')
 		fname = '%s/%s/%s' % (Args['contact_path'],Args['samples'][sm],file)
-		out = '%s/%s_%s' % (Args['out_path'],Args['out_names'][sm],file[:-12])
+		out = '%s/%s_%s' % (Args['out_path'],Args['out_names'][sm],file[:-13])
 		print 'read file', fname
 		print 'out file', out
 		if Args['chrom_sizes'].has_key(s[0]) == True and s[-1] == 'liftContacts':
@@ -104,12 +106,14 @@ for sm in range(len(Args['samples'])):
 					print '\tpre not found!'
 					Args['use_pre'] = False
 			if Args['use_pre'] == False:
+				elp = timeit.default_timer() - start_time
 				print '\tstart reading', s[0], s[1], s[2], elp
 				Order = psf.ChromIndexing(G)
 				allCon = psf.readContacts(fname,Order,resolution)
 				print '\tgenerate pre', out
 				M = psf.JuiceboxPre(allCon,Order,resolution,out)
 				del allCon
+				elp = timeit.default_timer() - start_time
 				print '\tpre writing', elp
 			R = RH[resolution]
 			F = out + '.Observed.pre'
@@ -118,4 +122,6 @@ for sm in range(len(Args['samples'])):
 			F = out + '.Control.pre'
 			O = out + '.Control.hic'
 			os.system( command + " " + F + " " + O + " " + G + " " + "-r" + " " + R + " "+ "-n")
+			elp = timeit.default_timer() - start_time
+			print '\t%s end hic generation %.2f' % (file, elp)
 		else: pass
