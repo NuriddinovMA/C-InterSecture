@@ -122,11 +122,6 @@ for sm in range(len(Args['samples'])):
 				else:
 					for m in M: L.append(m[3])
 				del M
-				print '\t\tmetric for %i bin frame writing: %.2f sec' % ( frame, elp)
-				ln = 1.*len(L)
-				h = np.histogram(L,bins=25,range=(0.,.5))
-				lb = Args['synblocks_files'][sm][s[0]].split('.')
-				plt.plot(h[1][1:],h[0]/ln,color=colorList[c],label='%s-%s_%s' % (lb[0][0],lb[1][0],s[2]))
 				elp = timeit.default_timer() - start_time
 				print '\t\tmetric for %i bin frame calculating: %.2f sec' % ( frame, elp)
 				if Args['statistics'] != False:
@@ -142,6 +137,7 @@ for sm in range(len(Args['samples'])):
 					del M
 					print '\t\trandom contact metric calculation: %.2f sec' % elp
 					ln = 1.*len(L)
+					lb = Args['synblocks_files'][sm][s[0]].split('.')
 					h = np.histogram(L,bins=25,range=(0.,.5))
 					del L
 					plt.plot(h[1][1:],h[0]/ln,color=colorList[c],linestyle='--',label='%s-%s_%s_random' % (lb[0][0],lb[1][0],s[2]))

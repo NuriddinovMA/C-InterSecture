@@ -223,8 +223,8 @@ def drawStat(Scale1,Scale2,conf):
 def JuiceboxPre(Contacts,Order,resolution,out):
 	Keys = Contacts.keys()
 	Keys.sort(key=lambda k:(Order[k[0]],Order[k[2]]))
-	f1 = open(out+'.Reference.pre','w')
-	f2 = open(out+'.Query.pre','w')
+	f1 = open(out+'.Observed.pre','w')
+	f2 = open(out+'.Control.pre','w')
 	for key in Keys: 
 		print >> f1, '0\t%s\t%i\t0\t1\t%s\t%i\t1\t%f' % (key[0],key[1]*resolution+1,key[2],key[3]*resolution+1, Contacts[key][0])
 		print >> f2, '0\t%s\t%i\t0\t1\t%s\t%i\t1\t%f' % (key[0],key[1]*resolution+1,key[2],key[3]*resolution+1, Contacts[key][1])
@@ -344,7 +344,9 @@ def metricCalc(contacts,resolution,**kwargs):
 			Keys.add( key[2:] )
 		Keys = sorted(Keys)
 		for key in Keys:
-			if synblocks == False or synblocks.has_key(key) == True:
+			if len(key[0]) < 3: key1 = 'chr'+key[0], key[1]
+			if len(key[0]) > 3: key1 = key[0][3:], key[1]
+			if synblocks == False or synblocks.has_key(key) == True or synblocks.has_key(key1) == True:
 				locus = key[0],key[1],key[1]+1
 				locusKeys = [(key[0],i) for i in range(key[1]-frame,key[1]+frame+1)]
 				metric.append( func(contacts,locus,locusKeys,max_dist,frame ) )
