@@ -18,7 +18,7 @@ The data preprocessing includes contacts filtration, statistical analysis and eq
 ```
 python unmappedBins.py < unmap.ini
 ```
-The file `unmap.ini` includes a space/tab delimited list of genome fasta files and bin sizes ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/0_preprocessing/EXAMPLE-UNMAP.ini)).
+The file `unmap.ini` includes a space/tab delimited list of genome fasta files and bin sizes ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/0_preprocessing/EXAMPLE-CHROM-SIZES.ini)).
 Output files are (and must been) placed with genome file and named as 'geneme_file_name.resolution.unmap' (if genome file named hg38.fa and bin size = 50 kb, the output must be named 'hg38.fa.50000.unmap'). The gap coverage files are stored in bed-liked format:
 ```
 chrName \ bin_start \ bin_end \ N-bases_percent
