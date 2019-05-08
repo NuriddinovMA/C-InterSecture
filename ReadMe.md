@@ -30,9 +30,9 @@ python pre.py < pre.ini
 Ini-file contains all needed parameters ([see example](https://github.com/NuriddinovMA/C-InterSecture/tree/master/0_preprocessing/EXAMPLE-PRE.ini)).
 
 **WARNING!** 
-(1) If you using output form **juicertools** dump, every file name MUST contain chromosome name.
-(2) Use verbose (-v) format to matrices.
-(3) Put raw matrix-files and normed matrix-files apart (one folder for raw, other folder for normed)
+* (1) If you using output form **juicertools** dump, every file name MUST contain chromosome name.
+* (2) Use verbose (-v) format to matrices.
+* (3) Put raw matrix-files and normed matrix-files apart (one folder for raw, other folder for normed)
 
 Preprocessing will output preprocessed contacts (`.initialContacts`-files), which are stored using a simple tab-delimited text format:
 ```
