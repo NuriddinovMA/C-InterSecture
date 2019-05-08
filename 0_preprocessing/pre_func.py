@@ -56,6 +56,17 @@ def iBin2Label(path, ChrInd, resolution):
 	f.close()
 	return binIdxs
 
+def iGenerateBinLabels(path, ChrInd, resolution):
+	binIdxs = [('',0)]
+	f = open(path,'r')
+	while True:
+		parse = f.readline().split()
+		try: binIdxs.extend( [ (ChrInd[parse[0]],i) for i in range(int(int(parse[1])/resolution+1)) ] ) 
+		except IndexError: break
+		except KeyError: binIdxs.append(False)
+	f.close()
+	return binIdxs
+
 def iSparseMatrixReader(path, binIdxs, unBinHash, **kwargs):
 	try: raw = kwargs['raw']
 	except KeyError: raw = True
