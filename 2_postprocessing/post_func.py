@@ -75,14 +75,12 @@ def readBED(file,resolution,type):
 def readContacts(file, Order, resolution, **kwargs):
 	try: short = kwargs['short']
 	except KeyError: short = False
-	try: loci = kwargs['loci']
-	except KeyError: loci = False
 	start_time = timeit.default_timer()
 	f = open(file, 'r')
 	lines = f.readlines()
 	f.close()
 	ln = len(lines)
-	if short == False and loci == False:
+	if short == False:
 		Contacts = {}
 		for i in range(ln-1,0,-1):
 			parse = lines[i].split()
@@ -97,28 +95,6 @@ def readContacts(file, Order, resolution, **kwargs):
 			dq =  float(parse[9])
 			l = float(parse[-2])
 			if HashTry(Contacts, key) == 0: Contacts[key] = [c,q,dr,dq,l]
-			else:
-				if l < Contacts[key][-1]: Contacts[key] = [c,q,dr,dq,l]
-			if (ln-i) % 1000000 == 0:
-				elp = timeit.default_timer() - start_time
-				print '\t\tcontact reading progress: %i, time elapsed: %.2f' % (ln-i, elp)
-			del lines[i]
-	elif short == False and loci == True:
-		for i in range(ln-1,0,-1):
-			parse = lines[i].split()
-			c0 = int(parse[1])/resolution
-			c2 = int(parse[3])/resolution
-			if (Order[parse[0]] < Order[parse[2]]): key = parse[0], c0, parse[2], c2
-			elif (Order[parse[0]] == Order[parse[2]]) and (c0 <= c2): key = parse[0], c0, parse[2], c2
-			else: key = parse[2], c2, parse[0], c0
-			c = float(parse[6])
-			q = float(parse[7])
-			dr = float(parse[8])
-			dq =  float(parse[9])
-			l = float(parse[-2])
-			if HashTry(Contacts, key) == 0: Contacts[key] = [c,q,dr,dq,l]
-			else:
-				if l < Contacts[key][-1]: Contacts[key] = [c,q,dr,dq,l]
 			if (ln-i) % 1000000 == 0:
 				elp = timeit.default_timer() - start_time
 				print '\t\tcontact reading progress: %i, time elapsed: %.2f' % (ln-i, elp)
@@ -527,4 +503,4 @@ def liftConCom(liftContacts,type,**kwargs):
 	
 def cc(a): return a[:,0],a[:,1]
 def dd(a): return a[:,2],a[:,3]
-def dc(a): return np.log2(1.0*a[:,0]/a[:,1]),np.log2(1.0*a[:,2]/a[:,3])
+def dc(a): return np.log2(1.0*a[:,2]/a[:,3]),np.log2(1.0*a[:,0]/a[:,1])

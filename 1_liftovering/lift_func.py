@@ -222,6 +222,49 @@ def pre2mark(preMark,name):
 	f1.close()
 	del markPoints
 
+def lftReadingMarkPoints(path, ChrIdxs1, ChrIdxs2):  #Creating Mark Point List to convert MarkPoint from species to species 
+	ObjCoorMP = {}
+	f = open(path, 'r')
+	lines = f.readlines()
+	f.close()
+	for i in range(len(lines)-1,0,-1):
+		try:
+			parse = lines[i].split()
+			del lines[i]
+			try: N1 = ChrIdxs1[parse[0]]
+			except KeyError: N1 = ChrIdxs1[parse[0][3:]]
+			c1 = ( int(parse[1]) + int(parse[2]) ) / 400
+			try: N2 = ChrIdxs2[parse[3]]
+			except KeyError: N1 = ChrIdxs1[parse[3][3:]]
+			c1 = ( int(parse[1]) + int(parse[2]) ) / 400
+			c2 = ( int(parse[4]) + int(parse[5]) ) / 400
+			if HashTry(ObjCoorMP, (N1,c1) ) == 0: ObjCoorMP[N1,c1] = set([ (N2,c2) ])
+			else: ObjCoorMP[N1,c1].add( (N2,c2) )
+		except IndexError: print 'Exception: IndexError',line
+		except KeyError: pass
+	return ObjCoorMP
+
+def lftRough(ObjCoorMP, ChrIdxs1, ChrIdxs2, bed, out):
+	lift = []
+	f = open(bed, 'r')
+	lines = f.readlines()
+	f.close()
+	f = open(out, 'w')
+	for i in range(len(lines)):
+		parse = lines[i].split()
+		try: N1 = ChrIdxs1[parse[0]]
+		except KeyError: N1 = ChrIdxs1[parse[0][3:]]
+		except IndexError: parse
+		c1 = int(parse[1]) / 200
+		c2 = int(parse[2]) / 200
+		for j in range(c1,c2+1,1):
+			try:
+				lifted = ObjCoorMP[N1,j]
+				for l in lifted: print >> f, ChrIdxs2[l[0]], l[1]*200, l[1]*200+199, parse[3]
+			except KeyError: pass
+	f.close()
+	return lift
+
 def iReadingMarkPoints(path, resolution, ChrIdxs1,ChrIdxs2,agg):  #Creating Mark Point List to convert MarkPoint from species to species 
 	ObjCoorMP = {},{},{}
 	key = ''

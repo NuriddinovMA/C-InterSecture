@@ -4,7 +4,7 @@ import timeit
 import pre_func as prf
 reload(prf)
 Args = {
-	'genome':'','chrom_order':'','sample_name':'','out_path':'',
+	'genome':'','chrom_sizes':'','sample_name':'','out_path':'','type':''
 	'raw_contacts':'', 'norm_contacts':'', 'genome_bins':'',
 	'statistic':'prc','resolution':10000, 'unmapped_bases':33,'coverage':1, 'max_distance':5, 'inter': False
 }
@@ -25,6 +25,10 @@ Args['inter'] == False #prf.boolean(Args['inter'])
 
 for key in Args: print key, ' = ', Args[key]
 
+if Args['type'] != 'HiC-Pro' and Args['type'] != 'Juicer':
+	print "Error! Unknown type of file %s ! Must be HiC-Pro or Juicer" % Args['type']
+	exit()
+
 suffix = '/%s.%s.%ikb.%iN.%iC.%iMb' % (Args['sample_name'],Args['statistic'],Args['resolution']/1000,Args['unmapped_bases'],Args['coverage'],Args['max_distance'])
 
 try: os.makedirs(Args['out_path'])
@@ -36,7 +40,7 @@ out_name = Args['out_path'] + suffix
 print 'Step 0: data preparing...'
 print '\tGenome analysis...'
 start_time = timeit.default_timer()
-l2i = prf.ChromIndexing(Args['chrom_order'])
+l2i = prf.ChromIndexing(Args['chrom_sizes'])
 ubh = prf.unmappedBasesBin(Args['genome'], Args['resolution'], l2i, Args['unmapped_bases'])
 elp = timeit.default_timer() - start_time
 print '\t... end genome analysing %.2f sec' % elp
@@ -44,7 +48,9 @@ print '\t... end genome analysing %.2f sec' % elp
 #Reading bin order
 #
 print '\tBin labels reading...'
-binIdxs = prf.iBin2Label(Args['genome_bins'],l2i,Args['resolution'])
+if Args['type'] == 'HiC-Pro': binIdxs = prf.iBin2Label(Args['genome_bins'],l2i,Args['resolution'])
+elif Args['type'] == 'Juicer': binIdxs = prf.iBin2Label(Args['chrom_sizes'],l2i,Args['resolution'])
+else: exit()
 elp = timeit.default_timer() - start_time
 print '\t...end bin labels reading %.2f sec' % elp
 print '...end data preparing %.2f sec' % elp
@@ -53,13 +59,13 @@ print '...end data preparing %.2f sec' % elp
 #
 print '\nStep 1: Raw matrix reading...'
 print '\tDropped bins', len(ubh)
-rawContactHash = prf.iSparseMatrixReader(Args['raw_contacts'], binIdxs, ubh, coverage=Args['coverage'], raw=True)
+rawContactHash = prf.iSparseMatrixReader(Args['raw_contacts'], binIdxs, ubh, coverage=Args['coverage'], type=Args['type'], raw=True)
 print '\tDropped bins', len(ubh)
 elp = timeit.default_timer() - start_time
 print '\t%i contact analyzing for %.2f sec; memory sized: %.2f Mb' % (len(rawContactHash[1]), elp, 1.0*sys.getsizeof(rawContactHash)/1024/1024)
 
 print '\nStep 2: Analyzing normalized marix for resolution %ikb... ' % (Args['resolution']/1000)
-normContactHash = prf.iSparseMatrixReader(Args['norm_contacts'], binIdxs, ubh, raw=False)
+normContactHash = prf.iSparseMatrixReader(Args['norm_contacts'], binIdxs, ubh, type=Args['type'], raw=False)
 elp = timeit.default_timer() - start_time
 print '\t%i normalized matrix reading tume: %.2f sec; memory sized: %.2f Mb' % (len(normContactHash),elp, sys.getsizeof(normContactHash )/1024.0/1024.0 )
 #H1 = set( normContactHash.keys() )
