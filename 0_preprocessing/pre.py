@@ -49,7 +49,7 @@ print '\t... end genome analysing %.2f sec' % elp
 #
 print '\tBin labels reading...'
 if Args['type'] == 'HiC-Pro': binIdxs = prf.iBin2Label(Args['genome_bins'],l2i,Args['resolution'])
-elif Args['type'] == 'Juicer': binIdxs = prf.iBin2Label(Args['chrom_sizes'],l2i,Args['resolution'])
+elif Args['type'] == 'Juicer': binIdxs = prf.iGenerateBinLabels(Args['chrom_sizes'],l2i,Args['resolution'])
 else: exit()
 elp = timeit.default_timer() - start_time
 print '\t...end bin labels reading %.2f sec' % elp
