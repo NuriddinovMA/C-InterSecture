@@ -159,17 +159,17 @@ def net2pre(parsedNet,name):
 	for chrName in chrNames:
 		syn = sorted(preMark[chrName].keys())
 		for key in syn:
-			if len(key[0]) < 6 and len(key[3]) < 6:
-				try: ind = int(key[3][3:])+1
-				except ValueError: ind = 0
-				if key[2]-key[1] < 5000: 
-					c = (key[2]+key[1])/2
-					c1,c2 = c - 2500,c + 2500
-				else: c1,c2 = key[1],key[2]
-				#print ind,color[ind]
-				print >> f2, '%s\t%i\t%i\t%s\t%i\t%i\t%s\t%s:%i-%i:%i' % (key[0],c1,c2,key[0],c1,c2,color[ind],key[3],key[4],key[5],key[6])
-				for i in preMark[chrName][key]: print >> f1, '%s\t%i\t%i\t%s\t%i\t%i' % (key[0],i[0],i[1],key[3],i[2],i[3])
-			else: pass
+			#if len(key[0]) < 6 and len(key[3]) < 6:
+			try: ind = int(key[3][3:])+1
+			except ValueError: ind = 0
+			if key[2]-key[1] < 5000: 
+				c = (key[2]+key[1])/2
+				c1,c2 = c - 2500,c + 2500
+			else: c1,c2 = key[1],key[2]
+			#print ind,color[ind]
+			print >> f2, '%s\t%i\t%i\t%s\t%i\t%i\t%s\t%s:%i-%i:%i' % (key[0],c1,c2,key[0],c1,c2,color[ind],key[3],key[4],key[5],key[6])
+			for i in preMark[chrName][key]: print >> f1, '%s\t%i\t%i\t%s\t%i\t%i' % (key[0],i[0],i[1],key[3],i[2],i[3])
+			#else: pass
 	f1.close()
 	f2.close()
 	return preMark
