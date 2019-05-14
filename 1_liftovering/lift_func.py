@@ -160,8 +160,9 @@ def net2pre(parsedNet,name):
 		syn = sorted(preMark[chrName].keys())
 		for key in syn:
 			#if len(key[0]) < 6 and len(key[3]) < 6:
-			try: ind = int(key[3][3:])+1
-			except ValueError: ind = 0
+			#try: ind = int(key[3][3:])+1
+			#except ValueError: 
+			ind = 0
 			if key[2]-key[1] < 5000: 
 				c = (key[2]+key[1])/2
 				c1,c2 = c - 2500,c + 2500
@@ -217,7 +218,8 @@ def pre2mark(preMark,name):
 	f1 = open(name+'.mark', 'w')
 	print >> f1, 'chr_sp1\tstart1\tend1\tchr_sp2\tstart2\tend2'
 	for m in markPoints:
-		if len(m[0]) < 6 and len(m[3]) < 6 and (m[2]-m[1] > 15) and (abs(m[5] - m[4]) > 15): print >> f1, '%s\t%i\t%i\t%s\t%i\t%i' % (m[0],m[1],m[2],m[3],m[4],m[5])
+		#if len(m[0]) < 6 and len(m[3]) < 6 and (m[2]-m[1] > 15) and (abs(m[5] - m[4]) > 15): print >> f1, '%s\t%i\t%i\t%s\t%i\t%i' % (m[0],m[1],m[2],m[3],m[4],m[5])
+		if (m[2]-m[1] > 15) and (abs(m[5] - m[4]) > 15): print >> f1, '%s\t%i\t%i\t%s\t%i\t%i' % (m[0],m[1],m[2],m[3],m[4],m[5])
 		else: pass
 	f1.close()
 	del markPoints
