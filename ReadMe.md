@@ -34,6 +34,7 @@ Ini-file contains all needed parameters ([see example](https://github.com/Nuridd
 2. Use verbose (-v) format to matrices.
 3. Put raw matrix-files and normed matrix-files apart (one folder for raw, other folder for normed)
 4. Juicertools dump-files don't contain name of chromosomes, only coordinates, likely, a order of columns with coordinate correspondents to a order of chromosomes in hic-file, then you MUST prove a identity of chromosome order in chromosome sizes file and Juicebox; If you don't want to suffer from uncertainty, you should dump only INTRAchromosomecontacts
+5. During proccessing juicertools dump files, the programm convert their into more compacted HiC-Pro-like format.
 
 Examples of juicertools dump command:
 * for *raw* matrix: 
