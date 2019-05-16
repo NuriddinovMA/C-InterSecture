@@ -1,5 +1,6 @@
 import timeit
 import sys
+import os
 try: import numpy as np
 except ImportError: print "numpy not found!"
 try: import scipy.stats as sc
@@ -56,16 +57,44 @@ def iBin2Label(path, ChrInd, resolution):
 	f.close()
 	return binIdxs
 
-def iGenerateBinLabels(path, ChrInd, resolution):
-	binIdxs = [('',0)]
+def iGenerateBinLabels(path, resolution):
+	temp = []
+	binIdxs = {}
 	f = open(path,'r')
-	while True:
-		parse = f.readline().split()
-		try: binIdxs.extend( [ (ChrInd[parse[0]],i) for i in range(int(int(parse[1])/resolution+1)) ] ) 
+	lines = f.readlines()
+	for line in lines:
+		parse = line.split()
+		end = int(parse[1])
+		try: 
+			temp.extend( [ [parse[0],i,i+resolution] for i in range(0,end,resolution) ] )
+			if temp[-1][-1] != end: temp[-1][-1] = end
 		except IndexError: break
-		except KeyError: binIdxs.append(False)
 	f.close()
+	f = open(path + '.binIdxs', 'w')
+	for i in range(len(temp)): 
+		print >> f, '%s\t%i\t%i\t%i' % (temp[i][0],temp[i][1],temp[i][2],i)
+		binIdxs[(temp[i][0],temp[i][1])] = i
+	del temp
+	f.close()
+	
 	return binIdxs
+
+def iConvert2binIdxs(path, ChrInd, binIdxs, suffix):
+	files = os.listdir(path)
+	out = open(path+'.' + suffix,'w')
+	for file in files:
+		parse = file.split('.')
+		chr1 = ChrInd[ min( ChrInd[parse[0]], ChrInd[parse[1]] ) ]
+		chr2 = ChrInd[ max( ChrInd[parse[0]], ChrInd[parse[1]] ) ]
+		f = open(path + '/' + file, 'r')
+		lines = f.readlines()
+		f.close()
+		for line in lines:
+			parse = line.split()
+			key1 = chr1,int(parse[0])
+			key2 = chr2,int(parse[1])
+			print >> out, '%i\t%i\t%s' % (binIdxs[key1],binIdxs[key2],parse[2])
+	out.close()
 
 def iSparseMatrixReader(path, binIdxs, unBinHash, **kwargs):
 	try: raw = kwargs['raw']
