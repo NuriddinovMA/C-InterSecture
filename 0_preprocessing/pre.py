@@ -54,9 +54,9 @@ if Args['type'] == 'Juicer':
 	Args['raw_contacts'] = Args['raw_contacts'] + '.raw'
 	prf.iConvert2binIdxs(Args['norm_contacts'],l2i,binIdxs,'.normed')
 	Args['norm_contacts'] = Args['norm_contacts'] + '.normed'
-if Args['type'] == 'HiC-Pro': binIdxs = prf.iBin2Label(Args['genome_bins'],l2i,Args['resolution'])
-el
+elif Args['type'] == 'HiC-Pro': binIdxs = prf.iBin2Label(Args['genome_bins'],l2i,Args['resolution'])
 else: exit()
+
 elp = timeit.default_timer() - start_time
 print '\t...end bin labels reading %.2f sec' % elp
 print '...end data preparing %.2f sec' % elp

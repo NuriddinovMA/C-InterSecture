@@ -33,6 +33,7 @@ Ini-file contains all needed parameters ([see example](https://github.com/Nuridd
 1. If you using output form **juicertools** dump, every file name MUST contain chromosome name.
 2. Use verbose (-v) format to matrices.
 3. Put raw matrix-files and normed matrix-files apart (one folder for raw, other folder for normed)
+4. Juicertools dump-file don't contain name of chromosome, only coordinate, likely, a order of columns with coordinate coresponents to a order of chromosomes, then you must prove a identity of chromosome order in chromsizes file and Juicebox
 
 Examples of juicertools dump command:
 * for *raw* matrix: 
