@@ -4,7 +4,7 @@ import timeit
 import pre_func as prf
 reload(prf)
 Args = {
-	'genome':'','chrom_sizes':'','sample_name':'','out_path':'','type':''
+	'genome':'','chrom_sizes':'','sample_name':'','out_path':'','type':'',
 	'raw_contacts':'', 'norm_contacts':'', 'genome_bins':'',
 	'statistic':'prc','resolution':10000, 'unmapped_bases':33,'coverage':1, 'max_distance':5, 'inter': False
 }
