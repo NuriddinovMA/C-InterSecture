@@ -51,14 +51,14 @@ except OSError: pass
 
 print '\nStep 0: chromosome indexing...'
 l2i = []
-fname = [Args['genome_path']+Args['chrom_orders'][i] for i in range(2)]
+fname = [Args['genome_path']+'/'+Args['chrom_orders'][i] for i in range(2)]
 for i in range(2): l2i.append( lf.ChromIndexing(fname[i]) )
 elp = timeit.default_timer() - start_time
 print '... chromosome indexing total time:', elp
 
 print '\nStep 1: data reading...'
 contactList = []
-fname = [Args['contact_path']+Args['contact_files'][i] for i in range(2)]
+fname = [Args['contact_path']+'/'+Args['contact_files'][i] for i in range(2)]
 for i in range(2):
 	print '\t' + Args['contact_files'][i]
 	contactList.append( lf.iReadPercentelizedContact(fname[i],l2i[i]) )
@@ -69,7 +69,7 @@ print '... contact reading total time:', elp
 
 print '\nStep 2: Reading mark points...'
 MarkPoints = []
-rname = [Args['remap_path']+Args['remap_files'][i] for i in range(2)]
+rname = [Args['remap_path']+'/'+Args['remap_files'][i] for i in range(2)]
 for i in range (2):
 	print '\t', rname[i],
 	MarkPoints.append( lf.iReadingMarkPoints(rname[i],Args['resolution'],l2i[i],l2i[i-1],Args['agg_frame'][i]) )
@@ -79,7 +79,7 @@ elp = timeit.default_timer() - start_time
 print '... mark point reading total time:', elp
 
 print '\nStep 3: start contact comparing...'
-fname = [Args['out_path']+Args['contact_files'][i] for i in range(2)]
+fname = [Args['out_path']+'/'+Args['contact_files'][i] for i in range(2)]
 for i in range(2):
 	out_name = '%s.%s.liftContacts' % (fname[i],Args['model'])
 	print '\tstart contact comparing...', out_name
