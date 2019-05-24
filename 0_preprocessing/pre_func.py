@@ -57,42 +57,48 @@ def iBin2Label(path, ChrInd, resolution):
 	f.close()
 	return binIdxs
 
-def iGenerateBinLabels(path, resolution):
-	temp = []
+def iGenerateBinLabels(path, ChrInd, resolution, out):
+	temp = [('',0)]
 	binIdxs = {}
 	f = open(path,'r')
 	lines = f.readlines()
 	for line in lines:
 		parse = line.split()
-		end = int(parse[1])
-		try: 
+		try:
+			end = int(parse[1])
 			temp.extend( [ [parse[0],i,i+resolution] for i in range(0,end,resolution) ] )
 			if temp[-1][-1] != end: temp[-1][-1] = end
-		except IndexError: break
+		except IndexError: pass
 	f.close()
-	f = open(path + '.binIdxs', 'w')
-	for i in range(len(temp)): 
+	f = open(out + '.%i.binIdxs' % resolution, 'w')
+	for i in range(1,len(temp)): 
 		print >> f, '%s\t%i\t%i\t%i' % (temp[i][0],temp[i][1],temp[i][2],i)
-		binIdxs[(temp[i][0],temp[i][1])] = i
+		chrm = ChrInd[temp[i][0]]
+		coor = temp[i][1]/resolution
+		binIdxs[(chrm,coor)] = i
+		binIdxs[i] = (chrm,coor)
 	del temp
 	f.close()
 	
 	return binIdxs
 
-def iConvert2binIdxs(path, ChrInd, binIdxs, suffix):
-	files = os.listdir(path)
-	out = open(path+'.' + suffix,'w')
+def iConvert2binIdxs(path, ChrInd, binIdxs, resolution, name, raw):
+	if raw: suffix = '/raw/'
+	else: suffix =  '/normed/'
+	files = os.listdir(path + suffix)
+	out = open(path + '/'+ name,'w')
 	for file in files:
+		print file
 		parse = file.split('.')
-		chr1 = ChrInd[ min( ChrInd[parse[0]], ChrInd[parse[1]] ) ]
-		chr2 = ChrInd[ max( ChrInd[parse[0]], ChrInd[parse[1]] ) ]
-		f = open(path + '/' + file, 'r')
+		chr1 = min( ChrInd[parse[0]], ChrInd[parse[1]] )
+		chr2 = max( ChrInd[parse[0]], ChrInd[parse[1]] )
+		f = open(path + suffix + file, 'r')
 		lines = f.readlines()
 		f.close()
 		for line in lines:
 			parse = line.split()
-			key1 = chr1,int(parse[0])
-			key2 = chr2,int(parse[1])
+			key1 = chr1,int(parse[0])/resolution
+			key2 = chr2,int(parse[1])/resolution
 			print >> out, '%i\t%i\t%s' % (binIdxs[key1],binIdxs[key2],parse[2])
 	out.close()
 
@@ -124,7 +130,7 @@ def _iRawSparceMatrixReader(path,binIdxs,unBinHash,format):
 		try:
 			s0 = binIdxs[int(parse[0])]
 			s1 = binIdxs[int(parse[1])]
-			c = format(parse[2])
+			c = format(float(parse[2]))
 			if ( ( (s0[0] == s1[0]) and (abs(s1[1] - s0[1]) > 1) ) or (s0[0] != s1[0]) ):
 				if ( HashTry(unBinHash, s0) == 0 ) and ( HashTry(unBinHash, s1) == 0 ): 
 					if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
@@ -142,8 +148,8 @@ def _iRawSparceMatrixReader(path,binIdxs,unBinHash,format):
 			if (ln-i) % 10000000 == 0:
 				elp = timeit.default_timer() - start_time
 				print '\t\traw sparse matrix parsing progress: %i, time elapsed: %.2f, memory sized: %.2fMb' % (ln-i, elp, 1.0*sys.getsizeof(contactHash)/1024/1024 )
-		except KeyError: pass
-		except TypeError: pass
+		except KeyError: pass#print 'key error'
+		
 	return contactHash
 
 def _iNormedSparceMatrixReader(path,binIdxs,format):
@@ -216,7 +222,7 @@ def _iMatrixNorming(contactHash, unBinHash):
 		if ( HashTry(unBinHash, key[:2]) == 0 ) and ( HashTry(unBinHash, key[2:]) == 0 ):
 			if key[0] == key[2]: l = abs(key[3] - key[1])
 			else: l = -1000
-			if (l == 1) or (l == 0): del contactHash[0][key]
+			if (l == 1) or (l == 0) or np.isnan(contactHash[0][key]): del contactHash[0][key]
 			else: contactHash[0][key] = int(contactHash[0][key]/contactHash[1][key[:2]]*1e6),l
 		else: del contactHash[0][key]
 	del contactHash[1]
