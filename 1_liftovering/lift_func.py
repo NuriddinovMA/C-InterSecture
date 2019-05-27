@@ -159,6 +159,7 @@ def net2pre(parsedNet,name):
 	for chrName in chrNames:
 		syn = sorted(preMark[chrName].keys())
 		for key in syn:
+			#print key
 			#if len(key[0]) < 6 and len(key[3]) < 6:
 			#try: ind = int(key[3][3:])+1
 			#except ValueError: 

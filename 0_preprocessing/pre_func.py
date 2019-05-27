@@ -168,19 +168,21 @@ def _iNormedSparceMatrixReader(path,binIdxs,format):
 			s0 = binIdxs[int(parse[0])]
 			s1 = binIdxs[int(parse[1])]
 			c = format(parse[2])
-			if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
-				if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
-				else: contactHash[0][s0+s1] += c
-			else:
-				if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
-				else: contactHash[0][s1+s0] += c
-			if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
-			else: contactHash[1][s0] += c
-			if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
-			else: contactHash[1][s1] += c
-			if (ln-i) % 10000000 == 0:
-				elp = timeit.default_timer() - start_time
-				print '\t\tnormed sparse matrix parsing progress: %i, time elapsed: %.2f, memory sized: %.2fMb' % (ln-i, elp, 1.0*sys.getsizeof(contactHash)/1024/1024 )
+			if np.isfinite(c):
+				if (s0[0] == s1[0] and s0[1] <= s1[1]) or (s0[0] < s1[0]): 
+					if HashTry(contactHash[0], s0+s1) == 0: contactHash[0][s0+s1] = c
+					else: contactHash[0][s0+s1] += c
+				else:
+					if HashTry(contactHash[0], s1+s0) == 0: contactHash[0][s1+s0] = c
+					else: contactHash[0][s1+s0] += c
+				if HashTry(contactHash[1], s0) == 0: contactHash[1][s0] = c
+				else: contactHash[1][s0] += c
+				if HashTry(contactHash[1], s1) == 0: contactHash[1][s1] = c
+				else: contactHash[1][s1] += c
+				if (ln-i) % 10000000 == 0:
+					elp = timeit.default_timer() - start_time
+					print '\t\tnormed sparse matrix parsing progress: %i, time elapsed: %.2f, memory sized: %.2fMb' % (ln-i, elp, 1.0*sys.getsizeof(contactHash)/1024/1024 )
+			else: pass
 		except KeyError: pass
 		except TypeError: pass
 	return contactHash
@@ -222,7 +224,7 @@ def _iMatrixNorming(contactHash, unBinHash):
 		if ( HashTry(unBinHash, key[:2]) == 0 ) and ( HashTry(unBinHash, key[2:]) == 0 ):
 			if key[0] == key[2]: l = abs(key[3] - key[1])
 			else: l = -1000
-			if (l == 1) or (l == 0) or np.isnan(contactHash[0][key]): del contactHash[0][key]
+			if (l == 1) or (l == 0): del contactHash[0][key]
 			else: contactHash[0][key] = int(contactHash[0][key]/contactHash[1][key[:2]]*1e6),l
 		else: del contactHash[0][key]
 	del contactHash[1]
