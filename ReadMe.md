@@ -1,5 +1,5 @@
 # C-InterSecture
-**C-InterSecture** (**C**omputional tool for **InterS**pecies analysis of genome archit**ecture**) pipeline is python 2.7 based utilits to cross-species comparison of Hi-C map. C-InterSecture was designed to liftover contacts between species, compare 3-dimensional organization of defined genomic regions, such as TADs, and analyze statistically individual contact frequencies..
+**C-InterSecture** (**C**omputional tool for **InterS**pecies analysis of genome archit**ecture**) pipeline is python 2.7 based utilits to cross-species comparison of Hi-C map. C-InterSecture was designed to liftover contacts between species, compare 3-dimensional organization of defined genomic regions, such as TADs, and analyze statistically individual contact frequencies. See the detailed description of pipeline in [C-InterSecture – a computational tool for interspecies comparison of genome architecture] (https://doi.org/10.1093/bioinformatics/btz415)
  
 ## Prerequisites:
 - numpy >= 1.9.0
