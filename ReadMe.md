@@ -41,10 +41,10 @@ Ini-file contains all needed parameters ([see example](https://github.com/Nuridd
 Examples of juicertools dump command:
 * for *raw* matrix: 
 
-java -jar juicertools.jar dump oe *NONE* -v path_to_hic **chrN1** **chrN2** BP 25000 raw/**chrN1**.**chrN2**.something_other
+java -jar juicertools.jar dump oe *NONE* -v path_to_hic **chrN1** **chrN2** BP 25000 _path_/raw/**chrN1**.**chrN2**.something_other
 * for *normed* matrix (can use any normalization): 
 
-java -jar juicertools.jar dump oe *KR* -v path_to_hic **chrN1** **chrN2** BP 25000 KR/**chrN1**.**chrN2**.something_other
+java -jar juicertools.jar dump oe *KR* -v path_to_hic **chrN1** **chrN2** BP 25000 _path_/normed/**chrN1**.**chrN2**.something_other
 
 Preprocessing will output preprocessed contacts (`.initialContacts`-files), which are stored using a simple tab-delimited text format:
 ```
