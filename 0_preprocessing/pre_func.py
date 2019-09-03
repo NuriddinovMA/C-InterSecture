@@ -285,16 +285,22 @@ def iPercentileStatistics(contactDistanceHash):
 	start_time = timeit.default_timer()
 	p = range(1,101)
 	temp = [i[5] for i in contactDistanceHash]
-	try: prcList = np.percentile(temp, p, interpolation='linear')
-	except TypeError:
-		#print '\t\tnumpy < 1.9.0',
-		prcList = np.percentile(temp, p)
-	except NameError:
-		#print '\t\tnumpy not found'
-		temp.sort()
-		ln = len(temp)
-		ind = [int(i*ln/100.0) for i in p]
-		prcList = [temp[i] for i in ind]
+	prcList = [],[]
+	#try: prcList = np.percentile(temp, p, interpolation='linear')
+	#except TypeError:
+	#	print '\t\tnumpy version < 1.9.0!',
+	#	prcList = np.percentile(temp, p)
+	#except NameError:
+	#print '\t\tnumpy not found!'
+	temp.sort()
+	ln = len(temp)
+	ind = np.int32(np.around( [(i*ln/100.0) for i in p] ))
+	#prcList = [temp[i] for i in ind]
+	i0 = 0
+	for i in range(100):
+		prcList[0].append( temp[ind[i]-1] )
+		prcList[1].append( np.median(temp[i0:ind[i]] ) )
+		i0 = ind[i]
 	del temp
 	elp = timeit.default_timer() - start_time
 	print '\t\ttime to prcList', elp
@@ -303,36 +309,39 @@ def iPercentileStatistics(contactDistanceHash):
 def iPRC(c,prcList):
 	prc = [0,0,0]
 	try:
-		prc[0] = int( np.rint(sc.percentileofscore(prcList,c[0],kind='rank') ) )
-		prc[1] = int( sc.percentileofscore(prcList,c[0]*(1-c[1]),kind='strict') )
-		prc[2] = int( sc.percentileofscore(prcList,c[0]*(1+c[1]),kind='weak') )
+		prc[0] = int( np.int32(sc.percentileofscore(prcList,c[0],kind='rank') ) ) + 1
+		prc[1] = int( sc.percentileofscore(prcList,c[0]*(1-c[1]),kind='strict') ) + 1
+		prc[2] = int( sc.percentileofscore(prcList,c[0]*(1+c[1]),kind='weak') ) + 1
 	except NameError:
 		cmin = c[0]*(1-c[1])
 		cmax = c[0]*(1+c[1])
 		cmed = [0,0]
 		for i in range(len(prcList)):
 			if cmin <= prcList[i]:
-				prc[1] = i
+				prc[1] = i+1
 				break
 			else: pass
 		for i in range (prc[1],len(prcList)):
 			if c[0] <= prcList[i]:
-				cmed[0] = i
+				cmed[0] = i+1
 				break
 			else: pass
 		else: cmed[0] = len(prcList)
 		for i in range (cmed[0],len(prcList)):
 			if c[0] > prcList[i]:
-				cmed[1] = i
+				cmed[1] = i+1
 				break
 			else: pass
 		else: cmed[1] = len(prcList)
 		prc[0] = int((cmed[0]+cmed[1])/2)
 		for i in range (len(prcList)-1,prc[0],-1):
 			if cmax >= prcList[i]:
-				prc[2] = i
+				prc[2] = i+1
 				break
 		else: prc[2] = prc[0]
+	if prc[0] == 101: prc[0] = 100
+	if prc[1] == 101: prc[1] = 100
+	if prc[2] == 101: prc[2] = 100
 	return prc
 
 def iPercentilizer(contactDistanceHash_key, prcList):
@@ -358,10 +367,12 @@ def iTotalContactListing(contactDistanceHash,statistics,resolution,path):
 	if statistics == 'prc':
 		for key in Keys:
 			print '\t %i contact transformed for %ikb distance' % (len(contactDistanceHash[key]),key*resolution/1000)
-			if key > 0: print >> f, '%ikb\t%i' % (key*resolution/1000, len(contactDistanceHash[key]))
-			else: print >> f, 'interchromosome\t%i' % len(contactDistanceHash[key])
+			if key > 0: print >> f, '%i\t%i' % (key, len(contactDistanceHash[key])),
+			else: print >> f, 'interchromosome\t%i' % len(contactDistanceHash[key]),
 			prcList = iPercentileStatistics(contactDistanceHash[key])
-			totalContactList += iPercentilizer(contactDistanceHash[key], prcList)
+			for i in prcList[1]: print >> f, i,
+			print >> f
+			totalContactList += iPercentilizer(contactDistanceHash[key], prcList[0])
 			contactDistanceHash[key] = 0
 			del prcList
 			elp = timeit.default_timer() - start_time
@@ -369,7 +380,7 @@ def iTotalContactListing(contactDistanceHash,statistics,resolution,path):
 	else:
 		for key in Keys:
 			print '\t %i contact transformed for %ikb distance' % (len(contactDistanceHash[key]),key*resolution/1000)
-			if key > 0: print >> f, '%ikb\t%i' % (key*resolution/1000, len(contactDistanceHash[key]))
+			if key > 0: print >> f, '%i\t%i' % (key, len(contactDistanceHash[key]))
 			else: print >> f, 'interchromosome\t%i' % len(contactDistanceHash[key])
 			totalContactList += iAbsoluteContacts(contactDistanceHash[key])
 			contactDistanceHash[key] = 0

@@ -6,7 +6,8 @@ import lift_func as lf
 Args = {
 	'contact_path':'','contact_files':'','genome_path':'','chrom_orders':'',
 	'remap_path':'','remap_files':'','out_path':'',
-	'resolution':50000,'agg_frame':[150000],'model':'balanced','inter': False,'dups_filter': 'default'
+	'resolution':50000,'agg_frame':[150000],
+	'prc_to_score':False,'model':'balanced','inter': False,'dups_filter': 'default'
 }
 
 lines = sys.stdin.readlines()
@@ -27,6 +28,7 @@ for line in lines:
 start_time = timeit.default_timer()
 
 Args['inter'] == lf.boolean(Args['inter'])
+Args['prc_to_score'] == lf.boolean(Args['prc_to_score'])
 
 if len(Args['agg_frame']) == 0:
 	print 'Using default values of agg_frame: 150000 bp'
@@ -58,12 +60,18 @@ print '... chromosome indexing total time:', elp
 
 print '\nStep 1: data reading...'
 contactList = []
+psList = []
 fname = [Args['contact_path']+'/'+Args['contact_files'][i] for i in range(2)]
 for i in range(2):
 	print '\t' + Args['contact_files'][i]
-	contactList.append( lf.iReadPercentelizedContact(fname[i],l2i[i]) )
+	contactList.append( lf.iReadInitialContact(fname[i],l2i[i]) )
+	if Args['prc_to_score']: psList.append( lf.readPSHash(fname[i]+'.stat', Args['resolution']) )
+	else: psList.append(False)
 	elp = timeit.default_timer() - start_time
 	print '... locus contact reading end time', elp, len(contactList[i])
+
+if psList[0] == False or psList[1] == False: psList[0],psList[1],Args['prc_to_score'] = False,False,False
+
 elp = timeit.default_timer() - start_time
 print '... contact reading total time:', elp
 
@@ -88,9 +96,9 @@ for i in range(2):
 	print '\tend contact comparing', elp
 	
 	print '\tDiffer contact writing'
-	lf.iPrintDifferContact(Dif_Contact[0], Args['resolution'], l2i[i], out_name, False)
+	lf.iPrintDifferContact(Dif_Contact[0], Args['resolution'], l2i[i], out_name, False, scoring=psList[i])
 	print '\t\tdistant contact writing'
-	lf.iPrintDifferContact(Dif_Contact[1], Args['resolution'], l2i[i], out_name, True)
+	lf.iPrintDifferContact(Dif_Contact[1], Args['resolution'], l2i[i], out_name, True, scoring=psList[i])
 	print '\t\tdropped dups contact writing'
 	del Dif_Contact
 	elp = timeit.default_timer() - start_time

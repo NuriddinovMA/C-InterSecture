@@ -1,4 +1,5 @@
 import math
+import numpy as np
 import timeit
 import sys
 
@@ -16,6 +17,15 @@ def HashTry(Hash, key):
 	except KeyError:
 		t = 0
 	return t
+
+def FindKey(Hash, key):
+	if key != 'interchromosome':
+		for k in range(key,-1,-1):
+			try: 
+				Hash[k]
+				return k
+			except KeyError: pass
+ 	else: return key
 
 def boolean(x):
 	if x == 'False' or x == 'false' or x == 'f' or x == 'F': return False
@@ -36,7 +46,7 @@ def ChromIndexing(path):
 	del lines
 	return ChrInd
 
-def iReadPercentelizedContact(path,ChrIdxs): #Reading Contact from database file
+def iReadInitialContact(path,ChrIdxs): #Reading Contact from database file
 	contactHash = {}
 	start_time = timeit.default_timer()
 	f = open(path+'.initialContacts','r')
@@ -55,6 +65,19 @@ def iReadPercentelizedContact(path,ChrIdxs): #Reading Contact from database file
 				print '\t\t contact reading: %i, time elapsed: %.2f, memory sized: %.2fMb' % (ln-i,elp,sys.getsizeof(contactHash)/1024./1024.)
 		except KeyError: pass
 	return contactHash
+
+def readPSHash(path,resolution):
+	psHash = {}
+	f = open(path,'r')
+	lines = f.readlines()
+	f.close()
+	for i in range(len(lines)):
+		parse = np.float32(lines[i].split()).tolist()
+		if len(parse[2:]) == 0: 
+			psHash = False
+			break
+		else: psHash[parse[0]] = parse[2:]
+	return psHash
 
 def iPercentelizedContactStatistic(path): #Reading Contact from database file
 	Stat = [[0 for j in range(10)] for i in range(5)], [[0 for j in range(10)] for i in range(5)], [[0 for j in range(10)] for i in range(5)]
@@ -511,20 +534,37 @@ def iDifferContact(Contact_disp_0, Contact_disp_1, ObjCoorMP, resolution, inter,
 	del Statistic
 	return DifferContact,Dups
 
-def iPrintDifferContact(data, resolution, ChrIdxs, out, dups):
+def iPrintDifferContact(data, resolution, ChrIdxs, out, dups,**kwargs):
 	if dups: out += '.dups'
+	try: psHash=kwargs['scoring']
+	except KeyError: psHash == False
 	f = open(out, 'w')
 	Keys = sorted(data.keys(),key=lambda x: (x[0],x[2],x[1],x[3]))
 	print >> f, 'chr1_observed\tpos1_observed\tchr2_observed\tpos2_observed\tremap1_control\tremap2_control\tobserved_contacts\tcontrol_contacts\tobserved_deviations\tcontrol_deviations\tobserved_coverages_pos1\tobserved_coverages_pos2\tcontrol_coverages_pos1\tcontrol_coverages_pos2\tcontrol_contact_distances\tremapping_coverages'
-	if dups:
-		for key in Keys:
-			for i in data[key]:
-				Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%.2f\t%.5f\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11])
-				print >> f, Str,
-	else:
-		for key in Keys:
-			i = data[key]
-			#for i in data[key]:
-			Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%.2f\t%.5f\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11])
-			print >> f, Str,
+	try:
+		if psHash == False: 
+			if dups:
+				for key in Keys:
+					for i in data[key]:
+						Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%.2f\t%.5f\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11])
+						print >> f, Str,
+			else:
+				for key in Keys:
+					i = data[key]
+					Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%.2f\t%.5f\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],i[2],i[2],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11])
+					print >> f, Str,
+		else:
+			if dups:
+				for key in Keys:
+					for i in data[key]:
+						k = FindKey(psHash,key[3]-key[1])
+						Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%.2f\t%.5f\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],psHash[k][i[2]-1],psHash[k][i[3]-1],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11])
+						print >> f, Str,
+			else:
+				for key in Keys:
+					i = data[key]
+					k = FindKey(psHash,key[3]-key[1])
+					Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%.2f\t%.5f\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],psHash[k][i[2]-1],psHash[k][i[3]-1],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11])
+					print >> f, Str,
+	except IndexError: print i		
 	f.close()
