@@ -52,7 +52,7 @@ chr1 \ pos1 \ chr2 \ pos2 \ contacts \ min \ max \ coverages1 \ coverages2 \ dis
 ```
 The *min* and *max* columns reflect a range of contact deviation. The *coverages1* and *coverages2* columns reflect a Hi-C read coverage of contacted bin. The *distance* columns store a genome distance between contacted bins. If *distances* = -1000, this contact is interchromosomal.
 
-The *pre*-scripts generate `.stat`-file too. This file contains destribution of contact numbers by distance groups. If a option `*statistic = prc*` is used, the stat-file contains median contacts for every percentiles within every distance groups. This file is needed if we use `*percentile_to_score = True*` option to contact liftovering. 
+The *pre*-scripts generate `.stat`-file too. This file contains destribution of contact numbers by distance groups. If a option `statistic = prc` is used, the stat-file contains median contacts for every percentiles within every distance groups. This file is needed if we use `percentile_to_score = True` option to contact liftovering. 
 
 ### Contact liftovering
 This step requires a pair of `.initialContacts`-files from compared species and a pair of files containing synteny map. 
