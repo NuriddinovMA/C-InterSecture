@@ -551,7 +551,7 @@ def iPrintDifferContact(data, resolution, ChrIdxs, out, dups,**kwargs):
 			else:
 				for key in Keys:
 					i = data[key]
-					Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%.2f\t%.5f\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],i[2],i[2],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11])
+					Str = '%s\t%i\t%s\t%i\t%s\t%s\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%i\t%.2f\t%.5f\n' % (ChrIdxs[key[0]],key[1]*resolution,ChrIdxs[key[2]],key[3]*resolution,i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11])
 					print >> f, Str,
 		else:
 			if dups:

@@ -71,7 +71,6 @@ for i in range(2):
 	print '... locus contact reading end time', elp, len(contactList[i])
 
 if psList[0] == False or psList[1] == False: psList[0],psList[1],Args['prc_to_score'] = False,False,False
-
 elp = timeit.default_timer() - start_time
 print '... contact reading total time:', elp
 
