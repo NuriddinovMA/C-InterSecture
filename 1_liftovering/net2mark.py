@@ -1,3 +1,4 @@
+import os
 import sys
 import timeit
 import lift_func as lf
@@ -15,15 +16,18 @@ for line in lines:
 	l = line.strip()
 	if l[0] != '#': file.append(l)
 	else: pass
+
 path = file[0]
-for flist in file[1:]:
-	for f in flist.split():
-		nP = lf.netParser(path+f)
-		n2p = lf.net2pre(nP, path+f)
-		del nP
-		lf.pre2mark(n2p, path+f)
-		del n2p
-		elp = timeit.default_timer() - start_time
-		print 'end converting:', f, elp
+if file[1] == '*': files = os.listdir(path)
+else: files = file[1:].split()
+print files
+for f in files:
+	nP = lf.netParser(path+f)
+	n2p = lf.net2pre(nP, path+f)
+	del nP
+	lf.pre2mark(n2p, path+f)
+	del n2p
+	elp = timeit.default_timer() - start_time
+	print 'end converting:', f, elp
 elp = timeit.default_timer() - start_time
 print 'total end converting', elp
