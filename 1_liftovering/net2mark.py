@@ -19,7 +19,7 @@ for line in lines:
 
 path = file[0]
 if file[1] == '*': files = os.listdir(path)
-else: files = file[1:].split()
+else: files = file[1:]
 print files
 for f in files:
 	nP = lf.netParser(path+f)

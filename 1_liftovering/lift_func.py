@@ -126,20 +126,18 @@ def netParser(name):
 	lines = f.readlines()
 	f.close()
 	parsedNet = {}
+	id = 0
 	for line in lines:
 		if line[0] == 'n': 
 			key = line.split()[1]
-			line = 0
-			parsedNet[key] = [[],]
+			parsedNet[key] = []
 		else:
-			k = 0
-			while line[k] == ' ': k += 1
-			ln = (k+1)/2
-			parse = line.split()[:7]
-			data = parse[0],int(parse[1]),int(parse[2]),parse[3],int(parse[5]),int(parse[6]),int(parse[4]+'1')
-			if len(parsedNet[key]) < ln: parsedNet[key].append([data,])
-			else: parsedNet[key][ln-1].append(data)
-			line = 0
+			parse = line.split()
+			if parse[0] == 'fill':
+				id += 1
+				data = parse[0],int(parse[1]),int(parse[2]),parse[3],int(parse[5]),int(parse[6]),int(parse[4]+'1'),id
+			else: data = parse[0],int(parse[1]),int(parse[2]),parse[3],int(parse[5]),int(parse[6]),int(parse[4]+'1')
+			parsedNet[key].append(data)
 	del lines
 	return parsedNet
 
@@ -148,22 +146,22 @@ def net2pre(parsedNet,name):
 	for chr1 in parsedNet:
 		preMark[chr1] = {}
 		for i in parsedNet[chr1]:
-			for j in i:
-				start1 = j[1]
-				end1 = start1+j[2]-1
-				chr2 = j[3]
-				dir = j[6]
-				if j[0] == 'fill':
-					start2 = j[4]
-					end2 = j[4] + j[5] - 1
-					if dir == 1: pass
-					else: start2,end2 = end2,start2
-					key = (chr1,start1,end1,chr2,start2,end2,dir)
-					preMark[chr1][key] = [(start1,start1,start2,start2),]
-				else:
-					start2 = j[4] - 1*dir
-					end2 = j[4] + j[5]*dir
-					preMark[chr1][key].append((start1,end1,start2,end2))
+			start1 = i[1]
+			end1 = start1+i[2]-1
+			chr2 = i[3]
+			dir = i[6]
+			id = i[-1]
+			if i[0] == 'fill':
+				start2 = i[4]
+				end2 = i[4] + i[5]-1
+				if dir == 1: pass
+				else: start2,end2 = end2,start2
+				key = (chr1,start1,end1,chr2,start2,end2,dir,id)
+				preMark[chr1][key] = [(start1,start1,start2,start2),]
+			else:
+				start2 = i[4]
+				end2 = i[4] + i[5]*dir
+				preMark[chr1][key].append((start1,end1,start2,end2))
 	for chrName in preMark:
 		for key in preMark[chrName]:
 			m = preMark[chrName][key]
@@ -176,7 +174,7 @@ def net2pre(parsedNet,name):
 	color = colorList()
 	f1 = open(name+'.pre.mark', 'w')
 	f2 = open(name+'.2D.ann', 'w')
-	print >> f1, 'chr1\tstart1\tend1\tchr2\tstart2\tend2'
+	print >> f1, 'chr1\tstart1\tend1\tchr2\tstart2\tend2\tid'
 	print >> f2, 'chr1\tstart1\tend1\tchr2\tstart2\tend2\tcolor\tcomment'
 	chrNames = sorted(preMark.keys())
 	for chrName in chrNames:
@@ -193,7 +191,7 @@ def net2pre(parsedNet,name):
 			else: c1,c2 = key[1],key[2]
 			#print ind,color[ind]
 			print >> f2, '%s\t%i\t%i\t%s\t%i\t%i\t%s\t%s:%i-%i:%i' % (key[0],c1,c2,key[0],c1,c2,color[ind],key[3],key[4],key[5],key[6])
-			for i in preMark[chrName][key]: print >> f1, '%s\t%i\t%i\t%s\t%i\t%i' % (key[0],i[0],i[1],key[3],i[2],i[3])
+			for i in preMark[chrName][key]: print >> f1, '%s\t%i\t%i\t%s\t%i\t%i\t%i' % (key[0],i[0],i[1],key[3],i[2],i[3],key[-1])
 			#else: pass
 	f1.close()
 	f2.close()
@@ -205,28 +203,29 @@ def pre2mark(preMark,name):
 	for chrName in chrNames:
 		syn = sorted(preMark[chrName].keys())
 		for s in syn:
+			id = s[-1]
 			ln = len(preMark[chrName][s])
 			gap = 0,0
 			if ln == 1:
 				coor = preMark[chrName][s][0]
-				mark = [s[0],coor[0],coor[1],s[3],coor[2],coor[3]]
+				mark = [s[0],coor[0],coor[1],s[3],coor[2],coor[3],id]
 				l1,l2 = mark[2]-mark[1],mark[5]-mark[4]
 				c = min( l1, abs(l2) )/200
 				if c > 0: 
 					c1,c2 = 1.*l1/(c+1),1.*l2/(c+1)
-					for k in range(c+1): markPoints.append( [mark[0], int(mark[1] + c1*k), int(mark[1] + c1*(k+1)), mark[3], int(mark[4] + c2*k), int(mark[4] + c2*(k+1)) ] )
+					for k in range(c+1): markPoints.append( [mark[0], int(mark[1] + c1*k), int(mark[1] + c1*(k+1)), mark[3], int(mark[4] + c2*k), int(mark[4] + c2*(k+1)),id ] )
 				else: markPoints.append(mark)
 			else:
 				for i in range(ln):
 					coor = preMark[chrName][s][i]
-					if i == 0: mark = [s[0],coor[0],coor[1],s[3],coor[2],coor[3]]
+					if i == 0: mark = [s[0],coor[0],coor[1],s[3],coor[2],coor[3],id]
 					elif i == ln-1:
 						mark[2],mark[5] = coor[1],coor[3]
 						l1,l2 = mark[2]-mark[1],mark[5]-mark[4]
 						c = min( l1, abs(l2) )/200
 						if c > 0: 
 							c1,c2 = 1.*l1/(c+1),1.*l2/(c+1)
-							for k in range(c+1): markPoints.append( [mark[0], int(mark[1] + c1*k), int(mark[1] + c1*(k+1)), mark[3], int(mark[4] + c2*k), int(mark[4] + c2*(k+1)) ] )
+							for k in range(c+1): markPoints.append( [mark[0], int(mark[1] + c1*k), int(mark[1] + c1*(k+1)), mark[3], int(mark[4] + c2*k), int(mark[4] + c2*(k+1)),id ] )
 						else: markPoints.append(mark)
 					else:
 						gap = coor[0]-mark[2],abs(coor[2]-mark[5])
@@ -236,14 +235,14 @@ def pre2mark(preMark,name):
 							c = min( l1, abs(l2) )/200
 							if c > 0:
 								c1,c2 = 1.*l1/(c+1),1.*l2/(c+1)
-								for k in range(c+1): markPoints.append( [mark[0], int(mark[1] + c1*k), int(mark[1] + c1*(k+1)), mark[3], int(mark[4] + c2*k), int(mark[4] + c2*(k+1)) ] )
+								for k in range(c+1): markPoints.append( [mark[0], int(mark[1] + c1*k), int(mark[1] + c1*(k+1)), mark[3], int(mark[4] + c2*k), int(mark[4] + c2*(k+1)),id ] )
 							else: markPoints.append(mark)
-							mark = [ s[0],coor[0],coor[1],s[3],coor[2],coor[3] ]
+							mark = [ s[0],coor[0],coor[1],s[3],coor[2],coor[3],id ]
 	f1 = open(name+'.mark', 'w')
-	print >> f1, 'chr_sp1\tstart1\tend1\tchr_sp2\tstart2\tend2'
+	print >> f1, 'chr1\tstart1\tend1\tchr2\tstart2\tend2\tid'
 	for m in markPoints:
 		#if len(m[0]) < 6 and len(m[3]) < 6 and (m[2]-m[1] > 15) and (abs(m[5] - m[4]) > 15): print >> f1, '%s\t%i\t%i\t%s\t%i\t%i' % (m[0],m[1],m[2],m[3],m[4],m[5])
-		if (m[2]-m[1] > 15) and (abs(m[5] - m[4]) > 15): print >> f1, '%s\t%i\t%i\t%s\t%i\t%i' % (m[0],m[1],m[2],m[3],m[4],m[5])
+		if (m[2]-m[1] > 15) and (abs(m[5] - m[4]) > 15): print >> f1, '%s\t%i\t%i\t%s\t%i\t%i\t%i' % (m[0],m[1],m[2],m[3],m[4],m[5],m[6])
 		else: pass
 	f1.close()
 	del markPoints
