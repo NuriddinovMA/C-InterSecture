@@ -88,7 +88,7 @@ def iConvert2binIdxs(path, ChrInd, binIdxs, resolution, name, raw):
 	files = os.listdir(path + suffix)
 	out = open(path + '/'+ name,'w')
 	for file in files:
-		print file
+		print '\t%s' %s file
 		parse = file.split('.')
 		chr1 = min( ChrInd[parse[0]], ChrInd[parse[1]] )
 		chr2 = max( ChrInd[parse[0]], ChrInd[parse[1]] )
@@ -99,7 +99,8 @@ def iConvert2binIdxs(path, ChrInd, binIdxs, resolution, name, raw):
 			parse = line.split()
 			key1 = chr1,int(parse[0])/resolution
 			key2 = chr2,int(parse[1])/resolution
-			print >> out, '%i\t%i\t%s' % (binIdxs[key1],binIdxs[key2],parse[2])
+			try: print >> out, '%i\t%i\t%s' % (binIdxs[key1],binIdxs[key2],parse[2])
+			except KeyError: print '\tBad genome coordinates:', ChrInd[chr1],key1[1], 'or', ChrInd[chr2],key2[1]
 	out.close()
 
 def iSparseMatrixReader(path, binIdxs, unBinHash, **kwargs):

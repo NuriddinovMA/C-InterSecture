@@ -14,7 +14,7 @@ file = []
 lines = sys.stdin.readlines()
 for line in lines:
 	l = line.strip()
-	if l[0] != '#': file.append(l)
+	if l[0] != '#': file.extend(l.split())
 	else: pass
 
 path = file[0]
