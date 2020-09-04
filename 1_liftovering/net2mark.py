@@ -22,11 +22,9 @@ if file[1] == '*': files = os.listdir(path)
 else: files = file[1:]
 print files
 for f in files:
-	nP = lf.netParser(path+f)
-	n2p = lf.net2pre(nP, path+f)
+	nP = lf.netParser(path+f,min_length=300,gap_length=100000)
+	lf.net2pre(nP, path+f)
 	del nP
-	lf.pre2mark(n2p, path+f)
-	del n2p
 	elp = timeit.default_timer() - start_time
 	print 'end converting:', f, elp
 elp = timeit.default_timer() - start_time

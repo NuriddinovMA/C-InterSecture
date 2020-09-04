@@ -121,131 +121,167 @@ def iPercentelizedContactStatistic(path): #Reading Contact from database file
 			Stat[2][i][j] = Stat[1][i][j]/Stat[0][i][j]
 	return Stat
 
-def netParser(name):
+def netParser(name,**kwargs):
+	try: min_length = kwargs['min_length']
+	except KeyError: min_length = 0
+	try: gap_length = kwargs['gap_length']
+	except KeyError: gap_length = 100000
 	f = open(name, 'r')
 	lines = f.readlines()
 	f.close()
-	parsedNet = {}
+	parsedNet = {},{}
 	id = 0
 	for line in lines:
 		if line[0] == 'n': 
 			key = line.split()[1]
-			parsedNet[key] = []
+			parsedNet[0][key] = []
 		else:
 			parse = line.split()
+			start1,ln1,start2,ln2 = int(parse[1]),int(parse[2]),int(parse[5]),int(parse[6])
+			dir = int(parse[4]+'1')
+			fi1,fi2 = start1+ln1,start2+ln2
 			if parse[0] == 'fill':
 				id += 1
-				data = parse[0],int(parse[1]),int(parse[2]),parse[3],int(parse[5]),int(parse[6]),int(parse[4]+'1'),id
-			else: data = parse[0],int(parse[1]),int(parse[2]),parse[3],int(parse[5]),int(parse[6]),int(parse[4]+'1')
-			parsedNet[key].append(data)
+				data = key,start1,fi1,parse[3],start2,fi2,dir,id
+				parsedNet[0][key].append(data)
+				parsedNet[1][id] = []
+			else:
+				data = key,start1,fi1,parse[3],start2,fi2,dir,id
+				parsedNet[1][id].append(data)
 	del lines
-	return parsedNet
 
-def net2pre(parsedNet,name):
-	preMark = {}
-	for chr1 in parsedNet:
-		preMark[chr1] = {}
-		for i in parsedNet[chr1]:
-			start1 = i[1]
-			end1 = start1+i[2]-1
-			chr2 = i[3]
-			dir = i[6]
-			id = i[-1]
-			if i[0] == 'fill':
-				start2 = i[4]
-				end2 = i[4] + i[5]-1
-				if dir == 1: pass
-				else: start2,end2 = end2,start2
-				key = (chr1,start1,end1,chr2,start2,end2,dir,id)
-				preMark[chr1][key] = [(start1,start1,start2,start2),]
+	for key in parsedNet[0]:
+		parsedNet[0][key].sort()
+		pN = parsedNet[0][key]
+		
+		for i in range(len(pN)):
+			pNj = parsedNet[1][pN[i][-1]]
+			chrm1,st1,fi1,chrm2,st2,fi2,dir,id = pN[i][0],pN[i][1],pN[i][2],pN[i][3],pN[i][4],pN[i][5],pN[i][6],pN[i][7]
+			if dir > 0:
+				for j in range(len(pNj)):
+					st1h,st2h = pNj[j][2],pNj[j][5]
+					pNj[j] = [chrm1,st1,pNj[j][1],chrm2,st2,pNj[j][4],dir,id]
+					st1,st2 = st1h,st2h
+					# pNj.append((chrm1,st1,fi1,chrm2,st2,fi2,dir,id))
+				pNj.append([chrm1,st1,fi1,chrm2,st2,fi2,dir,id])
 			else:
-				start2 = i[4]
-				end2 = i[4] + i[5]*dir
-				preMark[chr1][key].append((start1,end1,start2,end2))
-	for chrName in preMark:
-		for key in preMark[chrName]:
-			m = preMark[chrName][key]
-			temp = []
-			if len(m) == 1: preMark[chrName][key] = [(key[1],key[2],key[4],key[5])]
+				for j in range(len(pNj)):
+					st1h,fi2h = pNj[j][2],pNj[j][4]
+					pNj[j] = [chrm1,st1,pNj[j][1],chrm2,pNj[j][5],fi2,dir,id]
+					st1,fi2 = st1h,fi2h
+					# pNj.append((chrm1,st1,fi1,chrm2,st2,fi2,dir,id))
+				pNj.append([chrm1,st1,fi1,chrm2,st2,fi2,dir,id])
+		
+		for i in range(len(pN)-1):
+			try: parsedNet[1][pN[i][7]]
+			except KeyError: pass
 			else:
-				for i in range(1,len(m)): temp.append( (m[i-1][1],m[i][0],m[i-1][3],m[i][2]) )
-				temp.append( (m[i][1],key[2],m[i][3],key[5]) )
-				preMark[chrName][key] = temp
-	color = colorList()
-	f1 = open(name+'.pre.mark', 'w')
-	f2 = open(name+'.2D.ann', 'w')
+				for j in range(i+1,len(pN)):
+					try: parsedNet[1][pN[j][7]]
+					except KeyError: pass
+					else:
+						gap0 = pN[j][1] - pN[i][2]
+						if pN[i][6] > 0: gap1 = pN[j][4] - pN[i][5]
+						else: gap1 = pN[i][4] - pN[j][5]
+						
+						if pN[i][3] != pN[j][3] or pN[i][6] != pN[j][6]: pass
+						elif pN[i][6] > 0 and pN[i][5] > pN[j][4]: pass
+						elif pN[i][6] < 0 and pN[i][4] < pN[j][5]: pass
+						elif abs(gap0 - gap1) > gap_length or abs(math.log(1.*(gap0+1)/(gap1+1),2))>1.5: pass
+						else:
+							# parsedNet[0][key][i] = (pN[i][0],pN[j][1],pN[i][2],pN[i][3],min(pN[i][4],pN[j][4]),max(pN[i][5],pN[j][5]),pN[i][6],pN[i][7])
+							# pN[i] = (pN[i][0],pN[j][1],pN[i][2],pN[i][3],min(pN[i][4],pN[j][4]),max(pN[i][5],pN[j][5]),pN[i][6],pN[i][7])
+							parsedNet[1][pN[i][7]].extend(parsedNet[1][pN[j][7]])
+							del parsedNet[1][pN[j][7]]
+
+		for i in range(len(pN)-1,-1,-1):
+			try: parsedNet[1][pN[i][7]]
+			except KeyError: del parsedNet[0][key][i]
+			else:
+				if parsedNet[1][pN[i][7]][0][2] - parsedNet[1][pN[i][7]][0][1] < min_length:
+					del parsedNet[1][pN[i][7]]
+					del parsedNet[0][key][i]
+				else:
+					for j in parsedNet[1][pN[i][7]]: j[-1] = pN[i][7]
+	pN = []
+	Keys = parsedNet[1].keys()
+	for key in Keys: 
+		pN.append( parsedNet[1][key] )
+		del parsedNet[1][key]
+	del Keys
+	del parsedNet
+	pN.sort()
+	return pN
+
+def net2pre(parsedNet,out):
+	markPoints = []
+	f1 = open(out+'.pre.mark', 'w')
+	f2 = open(out+'.2D.ann', 'w')
+	
 	print >> f1, 'chr1\tstart1\tend1\tchr2\tstart2\tend2\tid'
 	print >> f2, 'chr1\tstart1\tend1\tchr2\tstart2\tend2\tcolor\tcomment'
-	chrNames = sorted(preMark.keys())
-	for chrName in chrNames:
-		syn = sorted(preMark[chrName].keys())
-		for key in syn:
-			#print key
-			#if len(key[0]) < 6 and len(key[3]) < 6:
-			#try: ind = int(key[3][3:])+1
-			#except ValueError: 
-			ind = 0
-			if key[2]-key[1] < 5000: 
-				c = (key[2]+key[1])/2
-				c1,c2 = c - 2500,c + 2500
-			else: c1,c2 = key[1],key[2]
-			#print ind,color[ind]
-			print >> f2, '%s\t%i\t%i\t%s\t%i\t%i\t%s\t%s:%i-%i:%i' % (key[0],c1,c2,key[0],c1,c2,color[ind],key[3],key[4],key[5],key[6])
-			for i in preMark[chrName][key]: print >> f1, '%s\t%i\t%i\t%s\t%i\t%i\t%i' % (key[0],i[0],i[1],key[3],i[2],i[3],key[-1])
-			#else: pass
+	for i in parsedNet:
+		a = 0
+		if i[0][6] > 1: st,fi = i[0][4],i[-1][5]
+		else: st,fi = i[-1][4],i[0][5]
+		print >> f2, '%s\t%i\t%i\t%s\t%i\t%i\t%s\t%s:%i-%i:%i' % (i[0][0],i[0][1],i[-1][2],i[0][0],i[0][1],i[-1][2],'0,255,0',i[0][3],st,fi,i[0][6])
+		for j in i:
+			try: print >> f1, '%s\t%i\t%i\t%s\t%i\t%i\t%i\t%i' % (j[0],j[1],j[2],j[3],j[4],j[5],j[6],j[7])
+			except TypeError: a = 1
+		if a == 1: print i
 	f1.close()
 	f2.close()
-	return preMark
+	
+	f3 = open(out+'.mark', 'w')
+	for i in parsedNet:
+		dir = i[0][6]
+		if dir > 0:
+			for j in range(len(i)):
+				ln1,ln2 = i[j][2]-i[j][1],i[j][5]-i[j][4]
+				if ln1 > 300: 
+					k = ln1/150.0
+					sp1,sp2 = ln1/k,ln2/k
+					h = []
+					for n in range(int(k)): h.append((i[j][1]+sp1*n,i[j][4]+sp2*n))
+					h.append( (i[j][2],i[j][5] ) )
+					for n in range(int(k)): markPoints.append( (i[j][0],int(h[n][0]),int(h[n+1][0]),i[j][3],int(h[n][1]),int(h[n+1][1]),i[j][6],i[j][7]) )
+				else: markPoints.append(i[j])
+				try:
+					gap1,gap2 = i[j+1][1]-i[j][2],i[j+1][4]-i[j][5]
+					if gap1 > 300:
+						k = gap1/150.0
+						sp1,sp2 = gap1/k,gap2/k
+						h = []
+						for n in range(int(k)): h.append((i[j][2]+sp1*n,i[j][5]+sp2*n))
+						h.append( (i[j+1][1],i[j+1][4] ) )
+						for n in range(int(k)): markPoints.append( (i[j][0],int(h[n][0]),int(h[n+1][0]),i[j][3],int(h[n][1]),int(h[n+1][1]),i[j][6],str(i[j][7])+'_gap') )
+					else: markPoints.append( (i[j][0],i[j][2],i[j+1][1],i[j][3],i[j][5],i[j+1][4],i[j][6],str(i[j][7])+'_gap') )
+				except IndexError: pass
+		else:
+			for j in range(len(i)):
+				ln1,ln2 = i[j][2]-i[j][1],i[j][5]-i[j][4]
+				if ln1 > 300: 
+					k = ln1/150.0
+					sp1,sp2 = ln1/k,ln2/k
+					h = []
+					for n in range(int(k)): h.append((i[j][1]+sp1*n,i[j][5]-sp2*n))
+					h.append( (i[j][2],i[j][4] ) )
+					for n in range(int(k)): markPoints.append( (i[j][0],int(h[n][0]),int(h[n+1][0]),i[j][3],int(h[n+1][1]),int(h[n][1]),i[j][6],i[j][7]) )
+				else: markPoints.append(i[j])
+				try:
+					gap1,gap2 = i[j+1][1]-i[j][2],i[j][4]-i[j+1][5]
+					if ln1 > 300: 
+						k = ln1/150.0
+						sp1,sp2 = ln1/k,ln2/k
+						h = []
+						for n in range(int(k)): h.append((i[j][2]+sp1*n,i[j][4]-sp2*n))
+						h.append( (i[j+1][1],i[j+1][5] ) )
+						for n in range(int(k)): markPoints.append( (i[j][0],int(h[n][0]),int(h[n+1][0]),i[j][3],int(h[n+1][1]),int(h[n][1]),i[j][6],str(i[j][7])+'_gap') )
+					else: markPoints.append( (i[j][0],i[j][2],i[j+1][1],i[j][3],i[j+1][5],i[j][4],i[j][6],str(i[j][7])+'_gap') )
+				except IndexError: pass
 
-def pre2mark(preMark,name):
-	markPoints = []
-	chrNames = sorted(preMark.keys())
-	for chrName in chrNames:
-		syn = sorted(preMark[chrName].keys())
-		for s in syn:
-			id = s[-1]
-			ln = len(preMark[chrName][s])
-			gap = 0,0
-			if ln == 1:
-				coor = preMark[chrName][s][0]
-				mark = [s[0],coor[0],coor[1],s[3],coor[2],coor[3],id]
-				l1,l2 = mark[2]-mark[1],mark[5]-mark[4]
-				c = min( l1, abs(l2) )/200
-				if c > 0: 
-					c1,c2 = 1.*l1/(c+1),1.*l2/(c+1)
-					for k in range(c+1): markPoints.append( [mark[0], int(mark[1] + c1*k), int(mark[1] + c1*(k+1)), mark[3], int(mark[4] + c2*k), int(mark[4] + c2*(k+1)),id ] )
-				else: markPoints.append(mark)
-			else:
-				for i in range(ln):
-					coor = preMark[chrName][s][i]
-					if i == 0: mark = [s[0],coor[0],coor[1],s[3],coor[2],coor[3],id]
-					elif i == ln-1:
-						mark[2],mark[5] = coor[1],coor[3]
-						l1,l2 = mark[2]-mark[1],mark[5]-mark[4]
-						c = min( l1, abs(l2) )/200
-						if c > 0: 
-							c1,c2 = 1.*l1/(c+1),1.*l2/(c+1)
-							for k in range(c+1): markPoints.append( [mark[0], int(mark[1] + c1*k), int(mark[1] + c1*(k+1)), mark[3], int(mark[4] + c2*k), int(mark[4] + c2*(k+1)),id ] )
-						else: markPoints.append(mark)
-					else:
-						gap = coor[0]-mark[2],abs(coor[2]-mark[5])
-						if gap[0] < 200 and gap[1] < 200: mark[2],mark[5] = coor[1],coor[3]
-						else:
-							l1,l2 = mark[2]-mark[1],mark[5]-mark[4]
-							c = min( l1, abs(l2) )/200
-							if c > 0:
-								c1,c2 = 1.*l1/(c+1),1.*l2/(c+1)
-								for k in range(c+1): markPoints.append( [mark[0], int(mark[1] + c1*k), int(mark[1] + c1*(k+1)), mark[3], int(mark[4] + c2*k), int(mark[4] + c2*(k+1)),id ] )
-							else: markPoints.append(mark)
-							mark = [ s[0],coor[0],coor[1],s[3],coor[2],coor[3],id ]
-	f1 = open(name+'.mark', 'w')
-	print >> f1, 'chr1\tstart1\tend1\tchr2\tstart2\tend2\tid'
-	for m in markPoints:
-		#if len(m[0]) < 6 and len(m[3]) < 6 and (m[2]-m[1] > 15) and (abs(m[5] - m[4]) > 15): print >> f1, '%s\t%i\t%i\t%s\t%i\t%i' % (m[0],m[1],m[2],m[3],m[4],m[5])
-		if (m[2]-m[1] > 15) and (abs(m[5] - m[4]) > 15): print >> f1, '%s\t%i\t%i\t%s\t%i\t%i\t%i' % (m[0],m[1],m[2],m[3],m[4],m[5],m[6])
-		else: pass
-	f1.close()
-	del markPoints
+	for i in markPoints: print >> f3,'%s\t%i\t%i\t%s\t%i\t%i\t%i\t%s' % (i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7])
+	f3.close()
 
 def lftReadingMarkPoints(path, ChrIdxs1, ChrIdxs2):  #Creating Mark Point List to convert MarkPoint from species to species 
 	ObjCoorMP = {}
